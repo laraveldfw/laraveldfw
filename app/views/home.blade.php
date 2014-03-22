@@ -111,7 +111,7 @@
                   <h2>Live Q&amp;A with Taylor Otwell</h2>
 
                   <!-- Presented By -->
-                  <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="https://twitter.com/taylorotwell">Taylor Otwell</a></h3>
+                  <h3 class="presenter-text"><span class="presented-by">Featuring (of course)</span> <a href="https://twitter.com/taylorotwell">Taylor Otwell</a></h3>
 
                   <!-- Free Stuff Alert -->
                   {{-- <div class="alert alert-success">Have a question for Taylor? <strong><a href="{{ route('ask') }}">Submit your question here</a></strong></div> --}}
