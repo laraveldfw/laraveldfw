@@ -1,0 +1,18 @@
+/**
+ * Selection Color
+ */
+::selection {
+    background: #FB503B;
+    color: #fff;
+    text-shadow: none;
+}
+
+::-moz-selection {
+    background: #FB503B;
+    color: #fff;
+    text-shadow: none;
+}
+
+*:focus {
+    outline: none;
+}

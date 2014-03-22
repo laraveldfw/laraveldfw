@@ -1,0 +1,44 @@
+/**
+ * Development Tools
+ */
+
+/**
+ * Responsive Breakpoint Debugging
+ */
+// body:before {   
+//   background: #888;
+//   clear: both;
+//   color: #fff;
+//   content: "We're huge above 1200px";
+//   float: left;
+//   font-size: 14px;
+//   font-size: .875rem;
+//   @include opacity(.3);
+//   padding: 1em 2%;
+//   text-align: center;
+//   width: 100%;
+// }
+
+// @include breakpoint(large) { 
+//   body:before {
+//     content: "We're large between 980px and 1199px";
+//   }
+// }
+
+// @include breakpoint(medium) { 
+//   body:before {
+//     content: "We're medium between 768px and 979px";
+//   }
+// }
+
+// @include breakpoint(small) { 
+//   body:before {
+//     content: "We're small at or below 767px";
+//   }
+// }
+
+// @include breakpoint(tiny) { 
+//   body:before {
+//     content: "We're tiny at or below 480px";
+//   }
+// }

@@ -1,0 +1,28 @@
+/**
+ * Mixins
+ */
+
+// Breakpoints for Responsiveness
+@mixin breakpoint($point) {
+  @if $point == huge {
+    @media (min-width: 1200px) { @content; }
+  }
+  @if $point == large {
+    @media (min-width: 980px) and (max-width: 1199px) { @content; }
+  }
+  @if $point == medium {
+    @media (min-width: 768px) and (max-width: 979px) { @content; }
+  }
+  @if $point == small {
+    @media (max-width: 767px)  { @content; }
+  }
+  @else if $point == tiny {
+    @media (max-width: 480px)  { @content; }
+  }
+};
+
+// Font Size REM with Pixel Fallback
+@mixin font-size($sizeValue: 1.6) {
+  font-size: ($sizeValue * 10) + px;
+  font-size: $sizeValue + rem;
+}
