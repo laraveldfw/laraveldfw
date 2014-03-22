@@ -5,6 +5,17 @@ use Illuminate\Database\Query\Builder;
 class SqlServerGrammar extends Grammar {
 
 	/**
+	 * All of the available clause operators.
+	 *
+	 * @var array
+	 */
+	protected $operators = array(
+		'=', '<', '>', '<=', '>=', '!<', '!>', '<>', '!=',
+		'like', 'not like', 'between', 'ilike',
+		'&', '&=', '|', '|=', '^', '^=',
+	);
+
+	/**
 	 * The keyword identifier wrapper format.
 	 *
 	 * @var string
@@ -48,12 +59,35 @@ class SqlServerGrammar extends Grammar {
 		// If there is a limit on the query, but not an offset, we will add the top
 		// clause to the query, which serves as a "limit" type clause within the
 		// SQL Server system similar to the limit keywords available in MySQL.
-		if ($query->limit > 0 and $query->offset <= 0)
+		if ($query->limit > 0 && $query->offset <= 0)
 		{
 			$select .= 'top '.$query->limit.' ';
 		}
 
 		return $select.$this->columnize($columns);
+	}
+
+	/**
+	 * Compile the "from" portion of the query.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder  $query
+	 * @param  string  $table
+	 * @return string
+	 */
+	protected function compileFrom(Builder $query, $table)
+	{
+		$from = parent::compileFrom($query, $table);
+
+		if (is_string($query->lock)) return $from.' '.$query->lock;
+
+		if ( ! is_null($query->lock))
+		{
+			return $from.' with(rowlock,'.($query->lock ? 'updlock,' : '').'holdlock)';
+		}
+		else
+		{
+			return $from;
+		}
 	}
 
 	/**
@@ -124,7 +158,7 @@ class SqlServerGrammar extends Grammar {
 
 			return "between {$start} and {$finish}";
 		}
-	
+
 		return ">= {$start}";
 	}
 

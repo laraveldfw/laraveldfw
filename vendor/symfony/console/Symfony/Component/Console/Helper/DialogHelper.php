@@ -19,7 +19,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DialogHelper extends Helper
+class DialogHelper extends InputAwareHelper
 {
     private $inputStream;
     private static $shell;
@@ -31,7 +31,7 @@ class DialogHelper extends Helper
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param array           $choices      List of choices to pick from
-     * @param Boolean         $default      The default answer if the user enters nothing
+     * @param Boolean|string  $default      The default answer if the user enters nothing
      * @param Boolean|integer $attempts Max number of times to ask before giving up (false by default, which means infinite)
      * @param string          $errorMessage Message which will be shown if invalid value from choice list would be picked
      * @param Boolean         $multiselect  Select more than one value separated by comma
@@ -98,6 +98,10 @@ class DialogHelper extends Helper
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
+        if ($this->input && !$this->input->isInteractive()) {
+            return $default;
+        }
+
         $output->write($question);
 
         $inputStream = $this->inputStream ?: STDIN;
@@ -333,7 +337,7 @@ class DialogHelper extends Helper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $default, $autocomplete, $that) {
+        $interviewer = function () use ($output, $question, $default, $autocomplete, $that) {
             return $that->ask($output, $question, $default, $autocomplete);
         };
 
@@ -363,7 +367,7 @@ class DialogHelper extends Helper
     {
         $that = $this;
 
-        $interviewer = function() use ($output, $question, $fallback, $that) {
+        $interviewer = function () use ($output, $question, $fallback, $that) {
             return $that->askHiddenResponse($output, $question, $fallback);
         };
 
@@ -401,7 +405,7 @@ class DialogHelper extends Helper
     }
 
     /**
-     * Return a valid unix shell
+     * Return a valid Unix shell
      *
      * @return string|Boolean  The valid shell name, false in case no valid shell is found
      */

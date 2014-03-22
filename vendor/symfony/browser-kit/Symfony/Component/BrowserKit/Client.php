@@ -32,19 +32,19 @@ abstract class Client
 {
     protected $history;
     protected $cookieJar;
-    protected $server;
+    protected $server = array();
     protected $internalRequest;
     protected $request;
     protected $internalResponse;
     protected $response;
     protected $crawler;
-    protected $insulated;
+    protected $insulated = false;
     protected $redirect;
-    protected $followRedirects;
+    protected $followRedirects = true;
 
-    private $maxRedirects;
-    private $redirectCount;
-    private $isMainRequest;
+    private $maxRedirects = -1;
+    private $redirectCount = 0;
+    private $isMainRequest = true;
 
     /**
      * Constructor.
@@ -58,13 +58,8 @@ abstract class Client
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
-        $this->history = null === $history ? new History() : $history;
-        $this->cookieJar = null === $cookieJar ? new CookieJar() : $cookieJar;
-        $this->insulated = false;
-        $this->followRedirects = true;
-        $this->maxRedirects = -1;
-        $this->redirectCount = 0;
-        $this->isMainRequest = true;
+        $this->history = $history ?: new History();
+        $this->cookieJar = $cookieJar ?: new CookieJar();
     }
 
     /**
@@ -302,12 +297,18 @@ abstract class Client
         }
 
         $uri = $this->getAbsoluteUri($uri);
-
         $server = array_merge($this->server, $server);
+
         if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
+
         $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
+
+        if ($port = parse_url($uri, PHP_URL_PORT)) {
+            $server['HTTP_HOST'] .= ':'.$port;
+        }
+
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
         $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
@@ -417,7 +418,7 @@ abstract class Client
      *
      * This method returns null if the DomCrawler component is not available.
      *
-     * @param string $uri     A uri
+     * @param string $uri     A URI
      * @param string $content Content for the crawler to use
      * @param string $type    Content type
      *
@@ -504,12 +505,19 @@ abstract class Client
             $content = $request->getContent();
         }
 
+        if ('get' === strtolower($method)) {
+            // Don't forward parameters for GET request as it should reach the redirection URI
+            $parameters = array();
+        } else {
+            $parameters = $request->getParameters();
+        }
+
         $server = $request->getServer();
         unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
 
         $this->isMainRequest = false;
 
-        $response = $this->request($method, $this->redirect, $request->getParameters(), $files, $server, $content);
+        $response = $this->request($method, $this->redirect, $parameters, $files, $server, $content);
 
         $this->isMainRequest = true;
 
@@ -532,9 +540,9 @@ abstract class Client
     /**
      * Takes a URI and converts it to absolute if it is not already absolute.
      *
-     * @param string $uri A uri
+     * @param string $uri A URI
      *
-     * @return string An absolute uri
+     * @return string An absolute URI
      */
     protected function getAbsoluteUri($uri)
     {
@@ -550,6 +558,11 @@ abstract class Client
                 isset($this->server['HTTPS']) ? 's' : '',
                 isset($this->server['HTTP_HOST']) ? $this->server['HTTP_HOST'] : 'localhost'
             );
+        }
+
+        // protocol relative URL
+        if (0 === strpos($uri, '//')) {
+            return parse_url($currentUri, PHP_URL_SCHEME).':'.$uri;
         }
 
         // anchor?

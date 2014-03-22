@@ -1,21 +1,24 @@
 <?php namespace Illuminate\Database\Eloquent;
 
-use Closure;
 use DateTime;
-use Carbon\Carbon;
 use ArrayAccess;
+use Carbon\Carbon;
+use LogicException;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterface {
@@ -99,7 +102,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * The accessors to append to the model's array form.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected $appends = array();
@@ -131,6 +134,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @var array
 	 */
 	protected $touches = array();
+
+	/**
+	 * User exposed observable events
+	 *
+	 * @var array
+	 */
+	protected $observables = array();
 
 	/**
 	 * The relations to eager load on every query.
@@ -196,6 +206,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	protected static $mutatorCache = array();
 
 	/**
+	 * The many to many relationship methods.
+	 *
+	 * @var array
+	 */
+	public static $manyMethods = array('belongsToMany', 'morphToMany', 'morphedByMany');
+
+	/**
 	 * The name of the "created at" column.
 	 *
 	 * @var string
@@ -224,14 +241,30 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __construct(array $attributes = array())
 	{
-		if ( ! isset(static::$booted[get_class($this)]))
-		{
-			static::boot();
+		$this->bootIfNotBooted();
 
-			static::$booted[get_class($this)] = true;
-		}
+		$this->syncOriginal();
 
 		$this->fill($attributes);
+	}
+
+	/**
+	 * Check if the model needs to be booted and if so, do it.
+	 *
+	 * @return void
+	 */
+	protected function bootIfNotBooted()
+	{
+		if ( ! isset(static::$booted[get_class($this)]))
+		{
+			static::$booted[get_class($this)] = true;
+
+			$this->fireModelEvent('booting', false);
+
+			static::boot();
+
+			$this->fireModelEvent('booted', false);
+		}
 	}
 
 	/**
@@ -288,10 +321,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  array  $attributes
 	 * @return \Illuminate\Database\Eloquent\Model|static
+	 *
+	 * @throws MassAssignmentException
 	 */
 	public function fill(array $attributes)
 	{
-		foreach ($attributes as $key => $value)
+		$totallyGuarded = $this->totallyGuarded();
+
+		foreach ($this->fillableFromArray($attributes) as $key => $value)
 		{
 			$key = $this->removeTableFromKey($key);
 
@@ -302,13 +339,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			{
 				$this->setAttribute($key, $value);
 			}
-			elseif ($this->totallyGuarded())
+			elseif ($totallyGuarded)
 			{
 				throw new MassAssignmentException($key);
 			}
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get the fillable attributes of a given array.
+	 *
+	 * @param  array  $attributes
+	 * @return array
+	 */
+	protected function fillableFromArray(array $attributes)
+	{
+		if (count($this->fillable) > 0 && ! static::$unguarded)
+		{
+			return array_intersect_key($attributes, array_flip($this->fillable));
+		}
+
+		return $attributes;
 	}
 
 	/**
@@ -361,6 +414,56 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	}
 
 	/**
+	 * Get the first record matching the attributes or create it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function firstOrCreate(array $attributes)
+	{
+		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		{
+			return $instance;
+		}
+
+		return static::create($attributes);
+	}
+
+	/**
+	 * Get the first record matching the attributes or instantiate it.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model
+	 */
+	public static function firstOrNew(array $attributes)
+	{
+		if ( ! is_null($instance = static::firstByAttributes($attributes)))
+		{
+			return $instance;
+		}
+
+		return new static($attributes);
+	}
+
+	/**
+	 * Get the first model for the given attributes.
+	 *
+	 * @param  array  $attributes
+	 * @return \Illuminate\Database\Eloquent\Model|null
+	 */
+	protected static function firstByAttributes($attributes)
+	{
+		$query = static::query();
+
+		foreach ($attributes as $key => $value)
+		{
+			$query->where($key, $value);
+		}
+
+		return $query->first() ?: null;
+	}
+
+	/**
 	 * Begin querying the model.
 	 *
 	 * @return \Illuminate\Database\Eloquent\Builder|static
@@ -410,12 +513,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public static function find($id, $columns = array('*'))
 	{
-		$instance = new static;
+		if (is_array($id) && empty($id)) return new Collection;
 
-		if (is_array($id))
-		{
-			return $instance->newQuery()->whereIn($instance->getKeyName(), $id)->get($columns);
-		}
+		$instance = new static;
 
 		return $instance->newQuery()->find($id, $columns);
 	}
@@ -426,19 +526,21 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  mixed  $id
 	 * @param  array  $columns
 	 * @return \Illuminate\Database\Eloquent\Model|Collection|static
+	 *
+	 * @throws ModelNotFoundException
 	 */
 	public static function findOrFail($id, $columns = array('*'))
 	{
 		if ( ! is_null($model = static::find($id, $columns))) return $model;
 
-		throw new ModelNotFoundException;
+		throw with(new ModelNotFoundException)->setModel(get_called_class());
 	}
 
 	/**
 	 * Eager load relations on the model.
 	 *
 	 * @param  array|string  $relations
-	 * @return void
+	 * @return \Illuminate\Database\Eloquent\Model
 	 */
 	public function load($relations)
 	{
@@ -447,6 +549,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		$query = $this->newQuery()->with($relations);
 
 		$query->eagerLoadRelations(array($this));
+
+		return $this;
 	}
 
 	/**
@@ -469,15 +573,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
+	 * @param  string  $localKey
 	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
 	 */
-	public function hasOne($related, $foreignKey = null)
+	public function hasOne($related, $foreignKey = null, $localKey = null)
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
 
-		return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey);
+		$localKey = $localKey ?: $this->getKeyName();
+
+		return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
 	}
 
 	/**
@@ -487,9 +594,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
+	 * @param  string  $localKey
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphOne
 	 */
-	public function morphOne($related, $name, $type = null, $id = null)
+	public function morphOne($related, $name, $type = null, $id = null, $localKey = null)
 	{
 		$instance = new $related;
 
@@ -497,7 +605,9 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		$table = $instance->getTable();
 
-		return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id);
+		$localKey = $localKey ?: $this->getKeyName();
+
+		return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
 	}
 
 	/**
@@ -505,39 +615,49 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
+	 * @param  string  $relation
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
-	public function belongsTo($related, $foreignKey = null)
+	public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
 	{
-		list(, $caller) = debug_backtrace(false);
+		// If no relation name was given, we will use this debug backtrace to extract
+		// the calling method's name and use that as the relationship name as most
+		// of the time this will be what we desire to use for the relatinoships.
+		if (is_null($relation))
+		{
+			list(, $caller) = debug_backtrace(false);
+
+			$relation = $caller['function'];
+		}
 
 		// If no foreign key was supplied, we can use a backtrace to guess the proper
 		// foreign key name by using the name of the relationship function, which
 		// when combined with an "_id" should conventionally match the columns.
-		$relation = $caller['function'];
-
 		if (is_null($foreignKey))
 		{
 			$foreignKey = snake_case($relation).'_id';
 		}
 
+		$instance = new $related;
+
 		// Once we have the foreign key names, we'll just create a new Eloquent query
 		// for the related models and returns the relationship instance which will
 		// actually be responsible for retrieving and hydrating every relations.
-		$instance = new $related;
-
 		$query = $instance->newQuery();
 
-		return new BelongsTo($query, $this, $foreignKey, $relation);
+		$otherKey = $otherKey ?: $instance->getKeyName();
+
+		return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
 	}
 
 	/**
-	 * Define an polymorphic, inverse one-to-one or many relationship.
+	 * Define a polymorphic, inverse one-to-one or many relationship.
 	 *
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphTo
 	 */
 	public function morphTo($name = null, $type = null, $id = null)
 	{
@@ -551,14 +671,29 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$name = snake_case($caller['function']);
 		}
 
-		// Next we will guess the type and ID if necessary. The type and IDs may also
-		// be passed into the function so that the developers may manually specify
-		// them on the relations. Otherwise, we will just make a great estimate.
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
-		$class = $this->$type;
+		// If the type value is null it is probably safe to assume we're eager loading
+		// the relationship. When that is the case we will pass in a dummy query as
+		// there are multiple types in the morph and we can't use single queries.
+		if (is_null($class = $this->$type))
+		{
+			return new MorphTo(
+				$this->newQuery(), $this, $id, null, $type, $name
+			);
+		}
 
-		return $this->belongsTo($class, $id);
+		// If we are not eager loading the relatinship, we will essentially treat this
+		// as a belongs-to style relationship since morph-to extends that class and
+		// we will pass in the appropriate values so that it behaves as expected.
+		else
+		{
+			$instance = new $class;
+
+			return new MorphTo(
+				with($instance)->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+			);
+		}
 	}
 
 	/**
@@ -566,15 +701,38 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 *
 	 * @param  string  $related
 	 * @param  string  $foreignKey
+	 * @param  string  $localKey
 	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
 	 */
-	public function hasMany($related, $foreignKey = null)
+	public function hasMany($related, $foreignKey = null, $localKey = null)
 	{
 		$foreignKey = $foreignKey ?: $this->getForeignKey();
 
 		$instance = new $related;
 
-		return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey);
+		$localKey = $localKey ?: $this->getKeyName();
+
+		return new HasMany($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+	}
+
+	/**
+	 * Define a has-many-through relationship.
+	 *
+	 * @param  string  $related
+	 * @param  string  $through
+	 * @param  string|null  $firstKey
+	 * @param  string|null  $secondKey
+	 * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+	 */
+	public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
+	{
+		$through = new $through;
+
+		$firstKey = $firstKey ?: $this->getForeignKey();
+
+		$secondKey = $secondKey ?: $through->getForeignKey();
+
+		return new HasManyThrough(with(new $related)->newQuery(), $this, $through, $firstKey, $secondKey);
 	}
 
 	/**
@@ -584,17 +742,23 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $name
 	 * @param  string  $type
 	 * @param  string  $id
+	 * @param  string  $localKey
 	 * @return \Illuminate\Database\Eloquent\Relations\MorphMany
 	 */
-	public function morphMany($related, $name, $type = null, $id = null)
+	public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
 	{
 		$instance = new $related;
 
+		// Here we will gather up the morph type and ID for the relationship so that we
+		// can properly query the intermediate table of a relation. Finally, we will
+		// get the table and create the relationship instances for the developers.
 		list($type, $id) = $this->getMorphs($name, $type, $id);
 
 		$table = $instance->getTable();
 
-		return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id);
+		$localKey = $localKey ?: $this->getKeyName();
+
+		return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
 	}
 
 	/**
@@ -604,11 +768,18 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  string  $table
 	 * @param  string  $foreignKey
 	 * @param  string  $otherKey
+	 * @param  string  $relation
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
 	 */
-	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null)
+	public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
 	{
-		$caller = $this->getBelongsToManyCaller();
+		// If no relationship name was passed, we will pull backtraces to get the
+		// name of the calling function. We will use that function name as the
+		// title of this relation since that is a great convention to apply.
+		if (is_null($relation))
+		{
+			$relation = $this->getBelongsToManyCaller();
+		}
 
 		// First, we'll need to determine the foreign key and "other key" for the
 		// relationship. Once we have determined the keys we'll make the query
@@ -632,7 +803,66 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// appropriate query constraint and entirely manages the hydrations.
 		$query = $instance->newQuery();
 
-		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $caller['function']);
+		return new BelongsToMany($query, $this, $table, $foreignKey, $otherKey, $relation);
+	}
+
+	/**
+	 * Define a polymorphic many-to-many relationship.
+	 *
+	 * @param  string  $related
+	 * @param  string  $name
+	 * @param  string  $table
+	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
+	 * @param  bool    $inverse
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+	 */
+	public function morphToMany($related, $name, $table = null, $foreignKey = null, $otherKey = null, $inverse = false)
+	{
+		$caller = $this->getBelongsToManyCaller();
+
+		// First, we will need to determine the foreign key and "other key" for the
+		// relationship. Once we have determined the keys we will make the query
+		// instances, as well as the relationship instances we need for these.
+		$foreignKey = $foreignKey ?: $name.'_id';
+
+		$instance = new $related;
+
+		$otherKey = $otherKey ?: $instance->getForeignKey();
+
+		// Now we're ready to create a new query builder for this related model and
+		// the relationship instances for this relation. This relations will set
+		// appropriate query constraints then entirely manages the hydrations.
+		$query = $instance->newQuery();
+
+		$table = $table ?: str_plural($name);
+
+		return new MorphToMany(
+			$query, $this, $name, $table, $foreignKey,
+			$otherKey, $caller, $inverse
+		);
+	}
+
+	/**
+	 * Define a polymorphic, inverse many-to-many relationship.
+	 *
+	 * @param  string  $related
+	 * @param  string  $name
+	 * @param  string  $table
+	 * @param  string  $foreignKey
+	 * @param  string  $otherKey
+	 * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+	 */
+	public function morphedByMany($related, $name, $table = null, $foreignKey = null, $otherKey = null)
+	{
+		$foreignKey = $foreignKey ?: $this->getForeignKey();
+
+		// For the inverse of the polymorphic many-to-many relations, we will change
+		// the way we determine the foreign and other keys, as it is the opposite
+		// of the morph-to-many method since we're figuring out these inverses.
+		$otherKey = $otherKey ?: $name.'_id';
+
+		return $this->morphToMany($related, $name, $table, $foreignKey, $otherKey, true);
 	}
 
 	/**
@@ -644,12 +874,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		$self = __FUNCTION__;
 
-		return array_first(debug_backtrace(false), function($trace) use ($self)
+		$caller = array_first(debug_backtrace(false), function($key, $trace) use ($self)
 		{
 			$caller = $trace['function'];
 
-			return $caller != 'belongsToMany' and $caller != $self;
+			return ( ! in_array($caller, Model::$manyMethods) && $caller != $self);
 		});
+
+		return ! is_null($caller) ? $caller['function'] : null;
 	}
 
 	/**
@@ -681,10 +913,15 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Destroy the models for the given IDs.
 	 *
 	 * @param  array|int  $ids
-	 * @return void
+	 * @return int
 	 */
 	public static function destroy($ids)
 	{
+		// We'll initialize a count here so we will return the total number of deletes
+		// for the operation. The developers can then check this number as a boolean
+		// type value or get this total count of records deleted for logging, etc.
+		$count = 0;
+
 		$ids = is_array($ids) ? $ids : func_get_args();
 
 		$instance = new static;
@@ -696,8 +933,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($instance->whereIn($key, $ids)->get() as $model)
 		{
-			$model->delete();
+			if ($model->delete()) $count++;
 		}
+
+		return $count;
 	}
 
 	/**
@@ -929,7 +1168,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Register a model event with the dispatcher.
 	 *
-	 * @param  string   $event
+	 * @param  string  $event
 	 * @param  \Closure|string  $callback
 	 * @return void
 	 */
@@ -950,10 +1189,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function getObservableEvents()
 	{
-		return array(
-			'creating', 'created', 'updating', 'updated',
-			'deleting', 'deleted', 'saving', 'saved',
-			'restoring', 'restored',
+		return array_merge(
+			array(
+				'creating', 'created', 'updating', 'updated',
+				'deleting', 'deleted', 'saving', 'saved',
+				'restoring', 'restored',
+			),
+			$this->observables
 		);
 	}
 
@@ -1082,6 +1324,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Finish processing on a successful save operation.
 	 *
+	 * @param  array  $options
 	 * @return void
 	 */
 	protected function finishSave(array $options)
@@ -1096,10 +1339,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Perform a model update operation.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @return bool
 	 */
-	protected function performUpdate($query)
+	protected function performUpdate(Builder $query)
 	{
 		$dirty = $this->getDirty();
 
@@ -1119,13 +1362,13 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			if ($this->timestamps)
 			{
 				$this->updateTimestamps();
-
-				$dirty = $this->getDirty();
 			}
 
 			// Once we have run the update operation, we will fire the "updated" event for
 			// this model instance. This will allow developers to hook into these after
 			// models are updated, giving them a chance to do any special processing.
+			$dirty = $this->getDirty();
+
 			$this->setKeysForSaveQuery($query)->update($dirty);
 
 			$this->fireModelEvent('updated', false);
@@ -1137,10 +1380,10 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Perform a model insert operation.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @return bool
 	 */
-	protected function performInsert($query)
+	protected function performInsert(Builder $query)
 	{
 		if ($this->fireModelEvent('creating') === false) return false;
 
@@ -1187,7 +1430,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * @param  array  $attributes
 	 * @return void
 	 */
-	protected function insertAndSetId($query, $attributes)
+	protected function insertAndSetId(Builder $query, $attributes)
 	{
 		$id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
@@ -1221,8 +1464,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Fire the given event for the model.
 	 *
-	 * @param  string $event
-	 * @param  bool   $halt
+	 * @param  string  $event
+	 * @param  bool    $halt
 	 * @return mixed
 	 */
 	protected function fireModelEvent($event, $halt = true)
@@ -1242,14 +1485,31 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Set the keys for a save update query.
 	 *
-	 * @param  \Illuminate\Database\Eloquent\Builder
+	 * @param  \Illuminate\Database\Eloquent\Builder  $query
 	 * @return \Illuminate\Database\Eloquent\Builder
 	 */
-	protected function setKeysForSaveQuery($query)
+	protected function setKeysForSaveQuery(Builder $query)
 	{
-		$query->where($this->getKeyName(), '=', $this->getKey());
+		$query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
 
 		return $query;
+	}
+
+	/**
+	 * Get the primary key value for a save query.
+	 *
+	 * @return mixed
+	 */
+	protected function getKeyForSaveQuery()
+	{
+		if (isset($this->original[$this->getKeyName()]))
+		{
+			return $this->original[$this->getKeyName()];
+		}
+		else
+		{
+			return $this->getAttribute($this->getKeyName());
+		}
 	}
 
 	/**
@@ -1278,7 +1538,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			$this->setUpdatedAt($time);
 		}
 
-		if ( ! $this->exists and ! $this->isDirty(static::CREATED_AT))
+		if ( ! $this->exists && ! $this->isDirty(static::CREATED_AT))
 		{
 			$this->setCreatedAt($time);
 		}
@@ -1349,7 +1609,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a fresh timestamp for the model.
 	 *
-	 * @return Carbon
+	 * @return \Carbon\Carbon
 	 */
 	public function freshTimestamp()
 	{
@@ -1359,7 +1619,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Get a fresh timestamp for the model.
 	 *
-	 * @return DateTime
+	 * @return string
 	 */
 	public function freshTimestampString()
 	{
@@ -1374,14 +1634,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function newQuery($excludeDeleted = true)
 	{
-		$builder = new Builder($this->newBaseQueryBuilder());
+		$builder = $this->newEloquentBuilder($this->newBaseQueryBuilder());
 
 		// Once we have the query builders, we will set the model instances so the
 		// builder can easily access any information it may need from the model
 		// while it is constructing and executing various queries against it.
 		$builder->setModel($this)->with($this->with);
 
-		if ($excludeDeleted and $this->softDelete)
+		if ($excludeDeleted && $this->softDelete)
 		{
 			$builder->whereNull($this->getQualifiedDeletedAtColumn());
 		}
@@ -1399,14 +1659,25 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		return $this->newQuery(false);
 	}
 
- 	/**
- 	 * Determine if the model instance has been soft-deleted.
- 	 *
- 	 * @return bool
- 	 */
+	/**
+	 * Create a new Eloquent query builder for the model.
+	 *
+	 * @param  \Illuminate\Database\Query\Builder $query
+	 * @return \Illuminate\Database\Eloquent\Builder|static
+	 */
+	public function newEloquentBuilder($query)
+	{
+		return new Builder($query);
+	}
+
+	/**
+	 * Determine if the model instance has been soft-deleted.
+	 *
+	 * @return bool
+	 */
 	public function trashed()
 	{
-		return $this->softDelete and ! is_null($this->{static::DELETED_AT});
+		return $this->softDelete && ! is_null($this->{static::DELETED_AT});
 	}
 
 	/**
@@ -1456,6 +1727,20 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function newCollection(array $models = array())
 	{
 		return new Collection($models);
+	}
+
+	/**
+	 * Create a new pivot model instance.
+	 *
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
+	 * @param  array   $attributes
+	 * @param  string  $table
+	 * @param  bool    $exists
+	 * @return \Illuminate\Database\Eloquent\Relations\Pivot
+	 */
+	public function newPivot(Model $parent, array $attributes, $table, $exists)
+	{
+		return new Pivot($parent, $attributes, $table, $exists);
 	}
 
 	/**
@@ -1710,14 +1995,14 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	{
 		if (static::$unguarded) return true;
 
-		// If the key is in the "fillable" array, we can of course assume tha it is
+		// If the key is in the "fillable" array, we can of course assume that it's
 		// a fillable attribute. Otherwise, we will check the guarded array when
 		// we need to determine if the attribute is black-listed on the model.
 		if (in_array($key, $this->fillable)) return true;
 
 		if ($this->isGuarded($key)) return false;
 
-		return empty($this->fillable) and ! starts_with($key, '_');
+		return empty($this->fillable) && ! starts_with($key, '_');
 	}
 
 	/**
@@ -1728,7 +2013,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function isGuarded($key)
 	{
-		return in_array($key, $this->guarded) or $this->guarded == array('*');
+		return in_array($key, $this->guarded) || $this->guarded == array('*');
 	}
 
 	/**
@@ -1738,7 +2023,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function totallyGuarded()
 	{
-		return count($this->fillable) == 0 and $this->guarded == array('*');
+		return count($this->fillable) == 0 && $this->guarded == array('*');
 	}
 
 	/**
@@ -1892,7 +2177,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 			// If the relationships snake-casing is enabled, we will snake case this
 			// key so that the relation attribute is snake cased in this returned
-			// array to the developer, making this consisntent with attributes.
+			// array to the developers, making this consistent with attributes.
 			if (static::$snakeAttributes)
 			{
 				$key = snake_case($key);
@@ -1901,7 +2186,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			// If the relation value has been set, we will set it on this attributes
 			// list for returning. If it was not arrayable or null, we'll not set
 			// the value on the array because it is some type of invalid value.
-			if (isset($relation) or is_null($value))
+			if (isset($relation) || is_null($value))
 			{
 				$attributes[$key] = $relation;
 			}
@@ -1933,7 +2218,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 			return array_intersect_key($values, array_flip($this->visible));
 		}
 
-		return array_diff_key($values, array_flip($this->hidden));	
+		return array_diff_key($values, array_flip($this->hidden));
 	}
 
 	/**
@@ -1949,7 +2234,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// If the key references an attribute, we can just go ahead and return the
 		// plain attribute value from the model. This allows every attribute to
 		// be dynamically accessed through the _get method without accessors.
-		if ($inAttributes or $this->hasGetMutator($key))
+		if ($inAttributes || $this->hasGetMutator($key))
 		{
 			return $this->getAttributeValue($key);
 		}
@@ -1969,9 +2254,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		if (method_exists($this, $camelKey))
 		{
-			$relations = $this->$camelKey()->getResults();
-
-			return $this->relations[$key] = $relations;
+			return $this->getRelationshipFromMethod($key, $camelKey);
 		}
 	}
 
@@ -2016,6 +2299,26 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		{
 			return $this->attributes[$key];
 		}
+	}
+
+	/**
+	 * Get a relationship value from a method.
+	 *
+	 * @param  string  $key
+	 * @param  string  $camelKey
+	 * @return mixed
+	 */
+	protected function getRelationshipFromMethod($key, $camelKey)
+	{
+		$relations = $this->$camelKey();
+
+		if ( ! $relations instanceof Relation)
+		{
+			throw new LogicException('Relationship method must return an object of type '
+				. 'Illuminate\Database\Eloquent\Relations\Relation');
+		}
+
+		return $this->relations[$key] = $relations->getResults();
 	}
 
 	/**
@@ -2100,7 +2403,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	/**
 	 * Convert a DateTime to a storable string.
 	 *
-	 * @param  DateTime|int  $value
+	 * @param  \DateTime|int  $value
 	 * @return string
 	 */
 	public function fromDateTime($value)
@@ -2128,7 +2431,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		// the field. This conveniently picks up those dates and format correct.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{
-			$value = Carbon::createFromFormat('Y-m-d', $value);
+			$value = Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
 		}
 
 		// If this value is some other type of string, we'll create the DateTime with
@@ -2146,7 +2449,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 * Return a timestamp as DateTime object.
 	 *
 	 * @param  mixed  $value
-	 * @return DateTime
+	 * @return \Carbon\Carbon
 	 */
 	protected function asDateTime($value)
 	{
@@ -2159,11 +2462,11 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 		}
 
 		// If the value is in simply year, month, day format, we will instantiate the
-		// Carbon instances from that fomrat. Again, this provides for simple date
+		// Carbon instances from that format. Again, this provides for simple date
 		// fields on the database, while still supporting Carbonized conversion.
 		elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value))
 		{
-			return Carbon::createFromFormat('Y-m-d', $value);
+			return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
 		}
 
 		// Finally, we will just assume this date is in the format used by default on
@@ -2273,7 +2576,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 		foreach ($this->attributes as $key => $value)
 		{
-			if ( ! array_key_exists($key, $this->original) or $value !== $this->original[$key])
+			if ( ! array_key_exists($key, $this->original) || $value !== $this->original[$key])
 			{
 				$dirty[$key] = $value;
 			}
@@ -2284,7 +2587,7 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 
 	/**
 	 * Get all the loaded relations for the instance.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getRelations()
@@ -2519,7 +2822,8 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	 */
 	public function __isset($key)
 	{
-		return isset($this->attributes[$key]) or isset($this->relations[$key]);
+		return ((isset($this->attributes[$key]) || isset($this->relations[$key])) ||
+				($this->hasGetMutator($key) && ! is_null($this->getAttributeValue($key))));
 	}
 
 	/**
@@ -2576,6 +2880,16 @@ abstract class Model implements ArrayAccess, ArrayableInterface, JsonableInterfa
 	public function __toString()
 	{
 		return $this->toJson();
+	}
+
+	/**
+	 * When a model is being unserialized, check if it needs to be booted.
+	 *
+	 * @return void
+	 */
+	public function __wakeup()
+	{
+		$this->bootIfNotBooted();
 	}
 
 }

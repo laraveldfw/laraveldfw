@@ -6,13 +6,12 @@ if ( ! function_exists('action'))
 	 * Generate a URL to a controller action.
 	 *
 	 * @param  string  $name
-	 * @param  string  $parameters
-	 * @param  bool    $absolute
+	 * @param  array   $parameters
 	 * @return string
 	 */
-	function action($name, $parameters = array(), $absolute = true)
+	function action($name, $parameters = array())
 	{
-		return app('url')->action($name, $parameters, $absolute);
+		return app('url')->action($name, $parameters);
 	}
 }
 
@@ -46,6 +45,32 @@ if ( ! function_exists('app_path'))
 	function app_path($path = '')
 	{
 		return app('path').($path ? '/'.$path : $path);
+	}
+}
+
+if ( ! function_exists('append_config'))
+{
+	/**
+	 * Assign high numeric IDs to a config item to force appending.
+	 *
+	 * @param  array  $array
+	 * @return array
+	 */
+	function append_config(array $array)
+	{
+		$start = 9999;
+
+		foreach ($array as $key => $value)
+		{
+			if (is_numeric($key))
+			{
+				$start++;
+
+				$array[$start] = array_pull($array, $key);
+			}
+		}
+
+		return $array;
 	}
 }
 
@@ -199,6 +224,22 @@ if ( ! function_exists('array_first'))
 	}
 }
 
+if ( ! function_exists('array_last'))
+{
+	/**
+	 * Return the last element in an array passing a given truth test.
+	 *
+	 * @param  array    $array
+	 * @param  Closure  $callback
+	 * @param  mixed    $default
+	 * @return mixed
+	 */
+	function array_last($array, $callback, $default = null)
+	{
+		return array_first(array_reverse($array), $callback, $default);
+	}
+}
+
 if ( ! function_exists('array_flatten'))
 {
 	/**
@@ -234,7 +275,7 @@ if ( ! function_exists('array_forget'))
 		{
 			$key = array_shift($keys);
 
-			if ( ! isset($array[$key]) or ! is_array($array[$key]))
+			if ( ! isset($array[$key]) || ! is_array($array[$key]))
 			{
 				return;
 			}
@@ -259,12 +300,12 @@ if ( ! function_exists('array_get'))
 	function array_get($array, $key, $default = null)
 	{
 		if (is_null($key)) return $array;
-		
+
 		if (isset($array[$key])) return $array[$key];
 
 		foreach (explode('.', $key) as $segment)
 		{
-			if ( ! is_array($array) or ! array_key_exists($segment, $array))
+			if ( ! is_array($array) || ! array_key_exists($segment, $array))
 			{
 				return value($default);
 			}
@@ -297,16 +338,34 @@ if ( ! function_exists('array_pluck'))
 	 * Pluck an array of values from an array.
 	 *
 	 * @param  array   $array
+	 * @param  string  $value
 	 * @param  string  $key
 	 * @return array
 	 */
-	function array_pluck($array, $key)
+	function array_pluck($array, $value, $key = null)
 	{
-		return array_map(function($value) use ($key)
-		{
-			return is_object($value) ? $value->$key : $value[$key];
+		$results = array();
 
-		}, $array);
+		foreach ($array as $item)
+		{
+			$itemValue = is_object($item) ? $item->{$value} : $item[$value];
+
+			// If the key is "null", we will just append the value to the array and keep
+			// looping. Otherwise we will key the array using the value of the key we
+			// received from the developer. Then we'll return the final array form.
+			if (is_null($key))
+			{
+				$results[] = $itemValue;
+			}
+			else
+			{
+				$itemKey = is_object($item) ? $item->{$key} : $item[$key];
+
+				$results[$itemKey] = $itemValue;
+			}
+		}
+
+		return $results;
 	}
 }
 
@@ -317,11 +376,12 @@ if ( ! function_exists('array_pull'))
 	 *
 	 * @param  array   $array
 	 * @param  string  $key
+	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	function array_pull(&$array, $key)
+	function array_pull(&$array, $key, $default = null)
 	{
-		$value = array_get($array, $key);
+		$value = array_get($array, $key, $default);
 
 		array_forget($array, $key);
 
@@ -354,7 +414,7 @@ if ( ! function_exists('array_set'))
 			// If the key doesn't exist at this depth, we will just create an empty array
 			// to hold the next value, allowing us to create the arrays to hold final
 			// values at the correct depth. Then we'll keep digging into the array.
-			if ( ! isset($array[$key]) or ! is_array($array[$key]))
+			if ( ! isset($array[$key]) || ! is_array($array[$key]))
 			{
 				$array[$key] = array();
 			}
@@ -383,6 +443,28 @@ if ( ! function_exists('array_sort'))
 	}
 }
 
+if ( ! function_exists('array_where'))
+{
+	/**
+	 * Filter the array using the given Closure.
+	 *
+	 * @param  array  $array
+	 * @param  \Closure  $callback
+	 * @return array
+	 */
+	function array_where($array, Closure $callback)
+	{
+		$filtered = array();
+
+		foreach ($array as $key => $value)
+		{
+			if (call_user_func($callback, $key, $value)) $filtered[$key] = $value;
+		}
+
+		return $filtered;
+	}
+}
+
 if ( ! function_exists('asset'))
 {
 	/**
@@ -403,6 +485,7 @@ if ( ! function_exists('base_path'))
 	/**
 	 * Get the path to the base of the install.
 	 *
+	 * @param  string $path
 	 * @return string
 	 */
 	function base_path($path = '')
@@ -447,6 +530,8 @@ if ( ! function_exists('csrf_token'))
 	 * Get the CSRF token value.
 	 *
 	 * @return string
+	 *
+	 * @throws RuntimeException
 	 */
 	function csrf_token()
 	{
@@ -459,6 +544,33 @@ if ( ! function_exists('csrf_token'))
 		else
 		{
 			throw new RuntimeException("Application session store not set.");
+		}
+	}
+}
+
+if ( ! function_exists('data_get'))
+{
+	/**
+	 * Get an item from an array or object using "dot" notation.
+	 *
+	 * @param  mixed   $target
+	 * @param  string  $key
+	 * @param  mixed   $default
+	 * @return mixed
+	 */
+	function data_get($target, $key, $default = null)
+	{
+		if (is_array($target))
+		{
+			return array_get($target, $key, $default);
+		}
+		elseif (is_object($target))
+		{
+			return object_get($target, $key, $default);
+		}
+		else
+		{
+			throw new \InvalidArgumentException("Array or object must be passed to data_get.");
 		}
 	}
 }
@@ -494,7 +606,7 @@ if ( ! function_exists('e'))
 if ( ! function_exists('ends_with'))
 {
 	/**
-	 * Determine if a given string ends with a given needle.
+	 * Determine if a given string ends with a given substring.
 	 *
 	 * @param string $haystack
 	 * @param string|array $needle
@@ -614,11 +726,11 @@ if ( ! function_exists('object_get'))
 	 */
 	function object_get($object, $key, $default = null)
 	{
-		if (is_null($key)) return $object;
-		
+		if (is_null($key) || trim($key) == '') return $object;
+
 		foreach (explode('.', $key) as $segment)
 		{
-			if ( ! is_object($object) or ! isset($object->{$segment}))
+			if ( ! is_object($object) || ! isset($object->{$segment}))
 			{
 				return value($default);
 			}
@@ -655,6 +767,7 @@ if ( ! function_exists('public_path'))
 	/**
 	 * Get the path to the public folder.
 	 *
+	 * @param  string $path
 	 * @return string
 	 */
 	function public_path($path = '')
@@ -669,13 +782,12 @@ if ( ! function_exists('route'))
 	 * Generate a URL to a named route.
 	 *
 	 * @param  string  $route
-	 * @param  string  $parameters
-	 * @param  bool    $absolute
+	 * @param  array   $parameters
 	 * @return string
 	 */
-	function route($route, $parameters = array(), $absolute = true)
+	function route($route, $parameters = array())
 	{
-		return app('url')->route($route, $parameters, $absolute);
+		return app('url')->route($route, $parameters);
 	}
 }
 
@@ -726,7 +838,7 @@ if ( ! function_exists('snake_case'))
 if ( ! function_exists('starts_with'))
 {
 	/**
-	 * Determine if a string starts with a given needle.
+	 * Determine if a given string starts with a given substring.
 	 *
 	 * @param  string  $haystack
 	 * @param  string|array  $needle
@@ -743,6 +855,7 @@ if ( ! function_exists('storage_path'))
 	/**
 	 * Get the path to the storage folder.
 	 *
+	 * @param   string $path
 	 * @return  string
 	 */
 	function storage_path($path = '')
@@ -754,7 +867,7 @@ if ( ! function_exists('storage_path'))
 if ( ! function_exists('str_contains'))
 {
 	/**
-	 * Determine if a given string contains a given sub-string.
+	 * Determine if a given string contains a given substring.
 	 *
 	 * @param  string        $haystack
 	 * @param  string|array  $needle
@@ -796,6 +909,22 @@ if ( ! function_exists('str_is'))
 	}
 }
 
+if ( ! function_exists('str_limit'))
+{
+		/**
+		 * Limit the number of characters in a string.
+		 *
+		 * @param  string  $value
+		 * @param  int     $limit
+		 * @param  string  $end
+		 * @return string
+		 */
+		function str_limit($value, $limit = 100, $end = '...')
+		{
+				return Illuminate\Support\Str::limit($value, $limit, $end);
+		}
+}
+
 if ( ! function_exists('str_plural'))
 {
 	/**
@@ -824,6 +953,27 @@ if ( ! function_exists('str_random'))
 	function str_random($length = 16)
 	{
 		return Illuminate\Support\Str::random($length);
+	}
+}
+
+if ( ! function_exists('str_replace_array'))
+{
+	/**
+	 * Replace a given value in the string sequentially with an array.
+	 *
+	 * @param  string  $search
+	 * @param  array  $replace
+	 * @param  string  $subject
+	 * @return string
+	 */
+	function str_replace_array($search, array $replace, $subject)
+	{
+		foreach ($replace as $value)
+		{
+			$subject = preg_replace('/'.$search.'/', $value, $subject, 1);
+		}
+
+		return $subject;
 	}
 }
 

@@ -7,7 +7,7 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $plural = array(
+	public static $plural = array(
 		'/(quiz)$/i' => "$1zes",
 		'/^(ox)$/i' => "$1en",
 		'/([m|l])ouse$/i' => "$1ice",
@@ -34,7 +34,7 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $singular = array(
+	public static $singular = array(
 		'/(quiz)zes$/i' => "$1",
 		'/(matr)ices$/i' => "$1ix",
 		'/(vert|ind)ices$/i' => "$1ex",
@@ -71,10 +71,12 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $irregular = array(
+	public static $irregular = array(
 		'child' => 'children',
 		'foot' => 'feet',
+		'freshman' => 'freshmen',
 		'goose' => 'geese',
+		'human' => 'humans',
 		'man' => 'men',
 		'move' => 'moves',
 		'person' => 'people',
@@ -87,7 +89,7 @@ class Pluralizer {
 	 *
 	 * @var array
 	 */
-	protected static $uncountable = array(
+	public static $uncountable = array(
 		'audio',
 		'equipment',
 		'deer',
@@ -103,6 +105,7 @@ class Pluralizer {
 		'moose',
 		'chassis',
 		'traffic',
+		'coreopsis',
 	);
 
 	/**
@@ -188,7 +191,7 @@ class Pluralizer {
 			if (preg_match($pattern = '/'.$pattern.'$/i', $value))
 			{
 				$irregular = static::matchCase($irregular, $value);
-				
+
 				return preg_replace($pattern, $irregular, $value);
 			}
 		}

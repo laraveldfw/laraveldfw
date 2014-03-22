@@ -2,10 +2,8 @@
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Composer;
-use Illuminate\Foundation\AssetPublisher;
 use ClassPreloader\Command\PreCompileCommand;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
 class OptimizeCommand extends Command {
 
@@ -52,9 +50,16 @@ class OptimizeCommand extends Command {
 	{
 		$this->info('Generating optimized class loader');
 
-		$this->composer->dumpOptimized();
+		if ($this->option('psr'))
+		{
+			$this->composer->dumpAutoloads();
+		}
+		else
+		{
+			$this->composer->dumpOptimized();
+		}
 
-		if ($this->option('force') or ! $this->laravel['config']['app.debug'])
+		if ($this->option('force') || ! $this->laravel['config']['app.debug'])
 		{
 			$this->info('Compiling common classes');
 
@@ -105,7 +110,7 @@ class OptimizeCommand extends Command {
 	 */
 	protected function registerClassPreloaderCommand()
 	{
-		$this->laravel['artisan']->add(new PreCompileCommand);
+		$this->getApplication()->add(new PreCompileCommand);
 	}
 
 	/**
@@ -117,6 +122,8 @@ class OptimizeCommand extends Command {
 	{
 		return array(
 			array('force', null, InputOption::VALUE_NONE, 'Force the compiled class file to be written.'),
+
+			array('psr', null, InputOption::VALUE_NONE, 'Do not optimize Composer dump-autoload.'),
 		);
 	}
 

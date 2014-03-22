@@ -19,6 +19,13 @@ class FileViewFinder implements ViewFinderInterface {
 	protected $paths;
 
 	/**
+	 * The array of views that have been located.
+	 *
+	 * @var array
+	 */
+	protected $views = array();
+
+	/**
 	 * The namespace to file path hints.
 	 *
 	 * @var array
@@ -59,9 +66,14 @@ class FileViewFinder implements ViewFinderInterface {
 	 */
 	public function find($name)
 	{
-		if (strpos($name, '::') !== false) return $this->findNamedPathView($name);
+		if (isset($this->views[$name])) return $this->views[$name];
 
-		return $this->findInPaths($name, $this->paths);
+		if (strpos($name, '::') !== false)
+		{
+			return $this->views[$name] = $this->findNamedPathView($name);
+		}
+
+		return $this->views[$name] = $this->findInPaths($name, $this->paths);
 	}
 
 	/**
@@ -82,6 +94,8 @@ class FileViewFinder implements ViewFinderInterface {
 	 *
 	 * @param  string  $name
 	 * @return array
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function getNamespaceSegments($name)
 	{
@@ -106,6 +120,8 @@ class FileViewFinder implements ViewFinderInterface {
 	 * @param  string  $name
 	 * @param  array   $paths
 	 * @return string
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	protected function findInPaths($name, $paths)
 	{
@@ -163,6 +179,25 @@ class FileViewFinder implements ViewFinderInterface {
 		if (isset($this->hints[$namespace]))
 		{
 			$hints = array_merge($this->hints[$namespace], $hints);
+		}
+
+		$this->hints[$namespace] = $hints;
+	}
+
+	/**
+	 * Prepend a namespace hint to the finder.
+	 *
+	 * @param  string  $namespace
+	 * @param  string|array  $hints
+	 * @return void
+	 */
+	public function prependNamespace($namespace, $hints)
+	{
+		$hints = (array) $hints;
+
+		if (isset($this->hints[$namespace]))
+		{
+			$hints = array_merge($hints, $this->hints[$namespace]);
 		}
 
 		$this->hints[$namespace] = $hints;

@@ -331,6 +331,22 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
+     * Disables validation
+     *
+     * @return self
+     */
+    public function disableValidation()
+    {
+        foreach ($this->fields->all() as $field) {
+            if ($field instanceof Field\ChoiceFormField) {
+                $field->disableValidation();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Sets the node for the form.
      *
      * Expects a 'submit' button \DOMNode and finds the corresponding form element.
@@ -367,46 +383,68 @@ class Form extends Link implements \ArrayAccess
         $this->node = $node;
     }
 
+    /**
+     * Adds form elements related to this form.
+     *
+     * Creates an internal copy of the submitted 'button' element and
+     * the form node or the entire document depending on whether we need
+     * to find non-descendant elements through HTML5 'form' attribute.
+     */
     private function initialize()
     {
         $this->fields = new FormFieldRegistry();
 
-        $document = new \DOMDocument('1.0', 'UTF-8');
-        $node = $document->importNode($this->node, true);
-        $button = $document->importNode($this->button, true);
-        $root = $document->appendChild($document->createElement('_root'));
-        $root->appendChild($node);
-        $root->appendChild($button);
-        $xpath = new \DOMXPath($document);
+        $xpath = new \DOMXPath($this->node->ownerDocument);
 
-        // add descendant elements to the form
-        $fieldNodes = $xpath->query('descendant::input | descendant::button | descendant::textarea | descendant::select', $root);
-        foreach ($fieldNodes as $node) {
-            $this->addField($node, $button);
+        // add submitted button if it has a valid name
+        if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
+            if ('input' == $this->button->nodeName && 'image' == $this->button->getAttribute('type')) {
+                $name = $this->button->getAttribute('name');
+                $this->button->setAttribute('value', '0');
+
+                // temporarily change the name of the input node for the x coordinate
+                $this->button->setAttribute('name', $name.'.x');
+                $this->set(new Field\InputFormField($this->button));
+
+                // temporarily change the name of the input node for the y coordinate
+                $this->button->setAttribute('name', $name.'.y');
+                $this->set(new Field\InputFormField($this->button));
+
+                // restore the original name of the input node
+                $this->button->setAttribute('name', $name);
+            } else {
+                $this->set(new Field\InputFormField($this->button));
+            }
         }
 
-        // find form elements corresponding to the current form by the HTML5 form attribute
+        // find form elements corresponding to the current form
         if ($this->node->hasAttribute('id')) {
+            // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
-            $xpath = new \DOMXPath($this->node->ownerDocument);
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s]', $formId, $formId, $formId, $formId));
+
+            // do the xpath query without $this->node as the context node (i.e. traverse through the whole document)
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId));
             foreach ($fieldNodes as $node) {
-                $this->addField($node, $button);
+                $this->addField($node);
+            }
+        } else {
+            // do the xpath query with $this->node as the context node, to only find descendant elements
+            // however, descendant elements with form attribute are not part of this form
+            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $this->node);
+            foreach ($fieldNodes as $node) {
+                $this->addField($node);
             }
         }
     }
 
-    private function addField(\DOMNode $node, \DOMNode $button)
+    private function addField(\DOMNode $node)
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;
         }
 
         $nodeName = $node->nodeName;
-
-        if ($node === $button) {
-            $this->set(new Field\InputFormField($node));
-        } elseif ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
+        if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == $node->getAttribute('type')) {
             $this->set(new Field\ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == $node->getAttribute('type')) {
             if ($this->has($node->getAttribute('name'))) {

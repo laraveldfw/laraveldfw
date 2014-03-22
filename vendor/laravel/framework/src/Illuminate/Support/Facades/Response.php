@@ -1,8 +1,10 @@
 <?php namespace Illuminate\Support\Facades;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Support\Contracts\ArrayableInterface;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class Response {
@@ -20,11 +22,11 @@ class Response {
 	 * @param  string  $content
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public static function make($content = '', $status = 200, array $headers = array())
 	{
-		return new \Illuminate\Http\Response($content, $status, $headers);
+		return new IlluminateResponse($content, $status, $headers);
 	}
 
 	/**
@@ -34,7 +36,7 @@ class Response {
 	 * @param  array   $data
 	 * @param  int     $status
 	 * @param  array   $headers
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return \Illuminate\Http\Response
 	 */
 	public static function view($view, $data = array(), $status = 200, array $headers = array())
 	{
@@ -49,35 +51,36 @@ class Response {
 	 * @param  string|array  $data
 	 * @param  int    $status
 	 * @param  array  $headers
+	 * @param  int    $options
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public static function json($data = array(), $status = 200, array $headers = array())
+	public static function json($data = array(), $status = 200, array $headers = array(), $options = 0)
 	{
 		if ($data instanceof ArrayableInterface)
 		{
 			$data = $data->toArray();
 		}
 
-		return new JsonResponse($data, $status, $headers);
+		return new JsonResponse($data, $status, $headers, $options);
 	}
 
 	/**
 	 * Return a new streamed response from the application.
 	 *
-	 * @param  Closure  $callback
+	 * @param  \Closure  $callback
 	 * @param  int      $status
 	 * @param  array    $headers
 	 * @return \Symfony\Component\HttpFoundation\StreamedResponse
 	 */
 	public static function stream($callback, $status = 200, array $headers = array())
 	{
-		return new \Symfony\Component\HttpFoundation\StreamedResponse($callback, $status, $headers);
+		return new StreamedResponse($callback, $status, $headers);
 	}
 
 	/**
 	 * Create a new file download response.
 	 *
-	 * @param  SplFileInfo|string  $file
+	 * @param  \SplFileInfo|string  $file
 	 * @param  string  $name
 	 * @param  array   $headers
 	 * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
@@ -88,7 +91,7 @@ class Response {
 
 		if ( ! is_null($name))
 		{
-			return $response->setContentDisposition('attachment', $name);
+			return $response->setContentDisposition('attachment', $name, Str::ascii($name));
 		}
 
 		return $response;
@@ -112,12 +115,14 @@ class Response {
 	 * @param  string  $method
 	 * @param  array  $parameters
 	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
 	 */
 	public static function __callStatic($method, $parameters)
 	{
 		if (isset(static::$macros[$method]))
 		{
-			return call_user_func_array(static::$macros[$method], func_get_args());
+			return call_user_func_array(static::$macros[$method], $parameters);
 		}
 
 		throw new \BadMethodCallException("Call to undefined method $method");
