@@ -20,3 +20,8 @@ Route::get('/ask', array('as' => 'ask', function()
 {
   return Redirect::away('https://tannerhearne.typeform.com/to/mq5pmL');
 }));
+
+Route::get('/hangout', array('as' => 'ask', function()
+{
+  return Redirect::away('https://plus.google.com/events/c9bd0hitdd3m5evnhsom09g4460');
+}));
