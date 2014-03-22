@@ -108,19 +108,22 @@
                   <h4>Next Meetup: <span class="meetup-date">Thursday, April 3rd at 7:00pm on <a href="{{ $locationurl }}" target="_blank">Google Hangouts</a></h4>
 
                   <!-- Presentation Title -->
-                  <h2>Q&amp;A with Taylor Otwell</h2>
+                  <h2>Live Q&amp;A with Taylor Otwell</h2>
 
                   <!-- Presented By -->
                   <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="https://twitter.com/taylorotwell">Taylor Otwell</a></h3>
 
                   <!-- Free Stuff Alert -->
-                  <div class="alert alert-danger">Have a question for Tayor? <a href="https://twitter.com/daylerees">Ask Taylor a question here Dayle Rees</a></strong> at this meetup!</div>
+                  {{-- <div class="alert alert-success">Have a question for Taylor? <strong><a href="{{ route('ask') }}">Submit your question here</a></strong></div> --}}
 
                   <!-- Free Stuff Alert -->
-                  <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div>
+                  {{-- <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div> --}}
 
                   <!-- RSVP Button -->
-                  <p><a id="rsvp-btn" class="btn btn-lg btn-danger" data-toggle="modal" href="http://www.meetup.com/laravel-dallas-fort-worth/events/158539822/" target="_blank">RSVP Now!</a></p>
+                  <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="http://www.meetup.com/laravel-dallas-fort-worth/events/158539822/" target="_blank">RSVP Now!</a>
+
+                  <!-- Ask Button -->
+                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Submit A Question</a>
                 </div>
               </div>
             </div>

@@ -8,15 +8,15 @@
     @media (min-width: 1200px) { @content; }
   }
   @if $point == large {
-    @media (min-width: 980px) and (max-width: 1199px) { @content; }
+    @media (min-width: 992px) and (max-width: 1199px) { @content; }
   }
   @if $point == medium {
-    @media (min-width: 768px) and (max-width: 979px) { @content; }
+    @media (min-width: 768px) and (max-width: 991px) { @content; }
   }
   @if $point == small {
-    @media (max-width: 767px)  { @content; }
+    @media (min-width: 481px) and (max-width: 767px) { @content; }
   }
-  @else if $point == tiny {
+  @else if $point == xsmall {
     @media (max-width: 480px)  { @content; }
   }
 };

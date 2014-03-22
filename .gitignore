@@ -5,6 +5,7 @@ composer.lock
 .env.php
 .DS_Store
 Thumbs.db
-public/node_modules
-public/Gruntfile.js
-public/package.json
+laraveldfw.com/.sass-cache
+laraveldfw.com/node_modules
+laraveldfw.com/Gruntfile.js
+laraveldfw.com/package.json

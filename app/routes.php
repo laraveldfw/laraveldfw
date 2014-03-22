@@ -15,3 +15,8 @@ Route::get('/', function()
 {
 	return View::make('home')->with('hidemap', true)->with('locationurl', 'http://www.meetup.com/laravel-dallas-fort-worth/events/172761382/');
 });
+
+Route::get('/ask', array('as' => 'ask', function()
+{
+  return Redirect::away('https://tannerhearne.typeform.com/to/mq5pmL');
+}));
