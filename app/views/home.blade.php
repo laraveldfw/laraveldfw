@@ -120,7 +120,7 @@
                   {{-- <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div> --}}
 
                   <!-- RSVP Button -->
-                  <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="http://www.meetup.com/laravel-dallas-fort-worth/events/158539822/" target="_blank">RSVP Now!</a>
+                  <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="http://www.meetup.com/laravel-dallas-fort-worth/events/172761382/" target="_blank">RSVP Now!</a>
 
                   <!-- Ask Button -->
                   <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Submit A Question</a>
