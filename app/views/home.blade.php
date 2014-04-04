@@ -105,7 +105,7 @@
                   <img src="{{ asset('img/taylor-otwell.jpg') }}" alt="David Adams" class="img-circle feature-speaker-image">
                 </div>
                 <div class="col-sm-9 feature-info">
-                  <h4>Next Meetup: <span class="meetup-date">Thursday, April 3rd at 7:00pm on <a href="{{ $locationurl }}" target="_blank">Google Hangouts</a></h4>
+                  <h4>Next Meetup: <span class="meetup-date">Thursday, April 10th at 7:00pm on <a href="{{ $locationurl }}" target="_blank">Google Hangouts</a></h4>
 
                   <!-- Presentation Title -->
                   <h2>Live Q&amp;A with Taylor Otwell</h2>
@@ -114,7 +114,7 @@
                   <h3 class="presenter-text"><span class="presented-by">Featuring (of course)</span> <a href="https://twitter.com/taylorotwell">Taylor Otwell</a></h3>
 
                   <!-- Free Stuff Alert -->
-                  {{-- <div class="alert alert-success">Have a question for Taylor? <strong><a href="{{ route('ask') }}">Submit your question here</a></strong></div> --}}
+                  <div class="alert alert-danger">Yikes! Due to bad weather this Q&amp;A has been moved to April 10th. Keep submitting questions and we'll see you on the 10th!</strong></div>
 
                   <!-- Free Stuff Alert -->
                   {{-- <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div> --}}
