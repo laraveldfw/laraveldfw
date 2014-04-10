@@ -26,6 +26,12 @@ Route::get('/hangout', array('as' => 'hangout', function()
   return Redirect::away('https://plus.google.com/events/c9bd0hitdd3m5evnhsom09g4460');
 }));
 
+Route::get('/live', array('as' => 'hangout', function()
+{
+  return Redirect::away('https://plus.google.com/events/c9bd0hitdd3m5evnhsom09g4460');
+}));
+
+
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
   return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/172761382/');
