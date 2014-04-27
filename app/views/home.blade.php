@@ -8,8 +8,8 @@
     // Enable the visual refresh
     google.maps.visualRefresh = true;
     var map;
-    var lat = 32.7307852;
-    var lon = -97.3269152;
+    var lat = 32.925756;
+    var lon = -97.087417;
     var laravelDFWLocation = new google.maps.LatLng(lat,lon);
 
     lat = lat + 0.008
@@ -36,7 +36,7 @@
         });
 
         markerinfo = new google.maps.InfoWindow({
-          content: '<a class="map-location-title-link" href="{{{ $locationurl }}}"><h4 class="map-location-title">The Music Bed</h4></a><h5 class="map-date">Thursday, February 9th at 7:00pm</h5><p class="map-location-address">158 West Magnolia Ave<br>Fort Worth, TX 76104</p>'
+          content: '<a class="map-location-title-link" href="{{{ $locationurl }}}"><h4 class="map-location-title">Grimaldi\'s</h4></a><h5 class="map-date">Thursday, May 1st at 7:00pm</h5><p class="map-location-address">1401 William D Tate Avenue<br>Grapevine, TX 76051</p>'
         });
         markerinfo.open(map, marker);
 
@@ -102,28 +102,25 @@
             <div class="container">
               <div class="row feature-content">
                 <div class="col-sm-3">
-                  <img src="{{ asset('img/taylor-otwell.jpg') }}" alt="David Adams" class="img-circle feature-speaker-image">
+                  <img src="{{ asset('img/doug-johnson.jpg') }}" alt="Doug Johnson" class="img-circle feature-speaker-image">
                 </div>
                 <div class="col-sm-9 feature-info">
-                  <h4>Next Meetup: <span class="meetup-date">Thursday, April 10th at 7:00pm on <a href="{{ $locationurl }}" target="_blank">Google Hangouts</a></h4>
+                  <h4>Next Meetup: <span class="meetup-date">Thursday, May 1st at 7:00pm at <a href="{{ $locationurl }}" target="_blank">Grimaldi's</a></h4>
 
                   <!-- Presentation Title -->
-                  <h2>Live Q&amp;A with Taylor Otwell</h2>
+                  <h2>Laravel REST App: From Zero to Live in Under an Hour</h2>
 
                   <!-- Presented By -->
-                  <h3 class="presenter-text"><span class="presented-by">Featuring (of course)</span> <a href="https://twitter.com/taylorotwell">Taylor Otwell</a></h3>
+                  <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="http://www.meetup.com/laravel-dallas-fort-worth/members/36754662/">Doug Johnson</a></h3>
 
                   <!-- Free Stuff Alert -->
-                  <div class="alert alert-danger">Yikes! Due to bad weather this Q&amp;A has been moved to April 10th. Keep submitting questions and we'll see you on the 10th!</strong></div>
-
-                  <!-- Free Stuff Alert -->
-                  {{-- <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div> --}}
+                  <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div>
 
                   <!-- RSVP Button -->
-                  <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="http://www.meetup.com/laravel-dallas-fort-worth/events/172761382/" target="_blank">RSVP Now!</a>
+                  <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="http://www.meetup.com/laravel-dallas-fort-worth/events/176967102/" target="_blank">RSVP Now!</a>
 
-                  <!-- Ask Button -->
-                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Submit A Question</a>
+                  {{-- <!-- Ask Button -->
+                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Submit A Question</a> --}}
                 </div>
               </div>
             </div>

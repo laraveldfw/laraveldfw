@@ -13,7 +13,7 @@
 
 Route::get('/', function()
 {
-	return View::make('home')->with('hidemap', true)->with('locationurl', 'http://www.meetup.com/laravel-dallas-fort-worth/events/172761382/');
+  return View::make('home')->with('hidemap', false)->with('locationurl', "https://www.google.com/maps/place/Grimaldi's/@32.9428451,-97.1184565,13z/data=!4m5!1m2!2m1!1sgrimaldi's+pizza!3m1!1s0x0:0xb2f23091741c5a94");
 });
 
 Route::get('/ask', array('as' => 'ask', function()
@@ -34,5 +34,5 @@ Route::get('/live', array('as' => 'hangout', function()
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/172761382/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/176967102/');
 }));
