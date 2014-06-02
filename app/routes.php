@@ -13,26 +13,38 @@
 
 Route::get('/', function()
 {
-  return View::make('home')->with('hidemap', false)->with('locationurl', "https://www.google.com/maps/place/Grimaldi's/@32.9428451,-97.1184565,13z/data=!4m5!1m2!2m1!1sgrimaldi's+pizza!3m1!1s0x0:0xb2f23091741c5a94");
+  $data = [
+    'hidemap' => true,
+    'meetupevent' => 'http://www.meetup.com/laravel-dallas-fort-worth/events/181020812/',
+    'locationname' => 'Google Hangouts',
+    'locationurl' => 'https://plus.google.com/events/c5ntekdiv2fd133r2smt40prqck',
+    'datetime' => 'Thursday, June 5th at 7:00pm',
+    'speaker' => 'Osvaldo Brignoni',
+    'speakerurl' => 'https://twitter.com/obrignoni',
+    'speakerimg' => 'img/osvaldo-brignoni.jpg',
+    'talk' => 'Building Streams'
+  ];
+
+  return View::make('home', compact('data'));
 });
 
-Route::get('/ask', array('as' => 'ask', function()
+Route::get('/ask', ['as' => 'ask', function()
 {
   return Redirect::away('https://tannerhearne.typeform.com/to/mq5pmL');
-}));
+}]);
 
 Route::get('/hangout', array('as' => 'hangout', function()
 {
-  return Redirect::away('https://plus.google.com/events/c9bd0hitdd3m5evnhsom09g4460');
+  return Redirect::away('https://plus.google.com/events/c5ntekdiv2fd133r2smt40prqck');
 }));
 
 Route::get('/live', array('as' => 'hangout', function()
 {
-  return Redirect::away('https://plus.google.com/events/c9bd0hitdd3m5evnhsom09g4460');
+  return Redirect::away('https://plus.google.com/events/c5ntekdiv2fd133r2smt40prqck');
 }));
 
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/176967102/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/181020812/');
 }));

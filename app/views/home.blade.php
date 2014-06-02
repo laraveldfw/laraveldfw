@@ -36,7 +36,7 @@
         });
 
         markerinfo = new google.maps.InfoWindow({
-          content: '<a class="map-location-title-link" href="{{{ $locationurl }}}"><h4 class="map-location-title">Grimaldi\'s</h4></a><h5 class="map-date">Thursday, May 1st at 7:00pm</h5><p class="map-location-address">1401 William D Tate Avenue<br>Grapevine, TX 76051</p>'
+          content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">1401 William D Tate Avenue<br>Grapevine, TX 76051</p>'
         });
         markerinfo.open(map, marker);
 
@@ -102,22 +102,22 @@
             <div class="container">
               <div class="row feature-content">
                 <div class="col-sm-3">
-                  <img src="{{ asset('img/doug-johnson.jpg') }}" alt="Doug Johnson" class="img-circle feature-speaker-image">
+                  <img src="{{ asset($data['speakerimg']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
                 </div>
                 <div class="col-sm-9 feature-info">
-                  <h4>Next Meetup: <span class="meetup-date">Thursday, May 1st at 7:00pm at <a href="{{ $locationurl }}" target="_blank">Grimaldi's</a></h4>
+                  <h4>Next Meetup: <span class="meetup-date">{{ $data['datetime'] }} at <a href="{{ $data['locationurl'] }}" target="_blank">{{ $data['locationname'] }}</a></h4>
 
                   <!-- Presentation Title -->
-                  <h2>Laravel REST App: From Zero to Live in Under an Hour</h2>
+                  <h2>{{ $data['talk'] }}</h2>
 
                   <!-- Presented By -->
-                  <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="http://www.meetup.com/laravel-dallas-fort-worth/members/36754662/">Doug Johnson</a></h3>
+                  <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speakerurl'] }}">{{ $data['speaker'] }}</a></h3>
 
                   <!-- Free Stuff Alert -->
                   <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div>
 
                   <!-- RSVP Button -->
-                  <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="http://www.meetup.com/laravel-dallas-fort-worth/events/176967102/" target="_blank">RSVP Now!</a>
+                  <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="{{ $data['meetupevent'] }}" target="_blank">RSVP Now!</a>
 
                   {{-- <!-- Ask Button -->
                   <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Submit A Question</a> --}}
@@ -129,10 +129,10 @@
       </div>
     </div>
     <div class="google-maps-wrapper">
-      @if($hidemap == true)
+      @if($data['hidemap'] == true)
         <h3 class="text-center">
           <i class="icon-location-arrow"></i>
-          The April Meetup is on Google Hangouts!
+          This Meetup is on Google Hangouts!
           <i class="icon-map-marker"></i>
         </h3>
       @else
