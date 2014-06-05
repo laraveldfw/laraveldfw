@@ -53,3 +53,8 @@ Route::get('/dallas-maker-space', array('as' => 'rsvp', function()
 {
   return Redirect::away('http://www.meetup.com/dallasmakerspace/events/182120322/');
 }));
+
+Route::get('/php-world', array('as' => 'rsvp', function()
+{
+  return Redirect::away('http://world.phparch.com');
+}));
