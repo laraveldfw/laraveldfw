@@ -48,3 +48,8 @@ Route::get('/rsvp', array('as' => 'rsvp', function()
 {
   return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/181020812/');
 }));
+
+Route::get('/dallas-maker-space', array('as' => 'rsvp', function()
+{
+  return Redirect::away('http://www.meetup.com/dallasmakerspace/events/182120322/');
+}));
