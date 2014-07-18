@@ -15,14 +15,14 @@ Route::get('/', function()
 {
   $data = [
     'hidemap' => true,
-    'meetupevent' => 'http://www.meetup.com/laravel-dallas-fort-worth/events/181020812/',
+    'meetupevent' => 'http://www.meetup.com/laravel-dallas-fort-worth/events/192671382/',
     'locationname' => 'Google Hangouts',
-    'locationurl' => 'https://plus.google.com/events/c5ntekdiv2fd133r2smt40prqck',
-    'datetime' => 'Thursday, June 5th at 7:00pm',
-    'speaker' => 'Osvaldo Brignoni',
-    'speakerurl' => 'https://twitter.com/obrignoni',
-    'speakerimg' => 'img/osvaldo-brignoni.jpg',
-    'talk' => 'Building Streams'
+    'locationurl' => 'https://plus.google.com/events/clie0k9fcfs5vgtmq8f0mfv8mu8',
+    'datetime' => 'Thursday, August 7th at 7:00pm',
+    'speaker' => 'John Fischelli',
+    'speakerurl' => 'https://twitter.com/johnfischelli',
+    'speakerimg' => 'img/john-fischelli.jpg',
+    'talk' => 'A practical look at your first Angular / Laravel App'
   ];
 
   return View::make('home', compact('data'));
