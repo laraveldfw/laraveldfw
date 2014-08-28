@@ -79,6 +79,7 @@
                     <li><a href="http://laravel.com/docs">Laravel Docs</a></li>
                     <li><a href="http://www.laracasts.com">Laracasts <span class="menu-subtext">Video Tutorials</span></a></li>
                     <li><a href="http://www.laravel.io">Laravel.io <span class="menu-subtext">The Community</span></a></li>
+                    <li><a href="http://www.larajobs.com">Larajobs.com <span class="menu-subtext">Find a Job</span></a></li>
                     <li><a href="https://leanpub.com/book_search?search=laravel">Books</a></li>
                     <li class="divider"></li>
                     <li class="dropdown-header">Twitter Accounts</li>
