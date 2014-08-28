@@ -15,14 +15,14 @@ Route::get('/', function()
 {
   $data = [
     'hidemap' => true,
-    'meetupevent' => 'http://www.meetup.com/laravel-dallas-fort-worth/events/192671382/',
+    'meetupevent' => 'http://www.meetup.com/laravel-dallas-fort-worth/events/200296712/',
     'locationname' => 'Google Hangouts',
-    'locationurl' => 'https://plus.google.com/events/clie0k9fcfs5vgtmq8f0mfv8mu8',
-    'datetime' => 'Thursday, August 7th at 7:00pm',
-    'speaker' => 'John Fischelli',
-    'speakerurl' => 'https://twitter.com/johnfischelli',
-    'speakerimg' => 'img/john-fischelli.jpg',
-    'talk' => 'A practical look at your first Angular / Laravel App'
+    'locationurl' => 'https://plus.google.com/events/ct3s9qin5mcd7tpfnj6soheigbo',
+    'datetime' => 'Thursday, September 4th at 7:00pm',
+    'speaker' => 'Andrew Del Prete',
+    'speakerurl' => 'https://twitter.com/pathsofdesign',
+    'speakerimg' => 'img/andrew-del-prete.jpg',
+    'talk' => 'Laravel + Restangular'
   ];
 
   return View::make('home', compact('data'));
@@ -30,17 +30,17 @@ Route::get('/', function()
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://tannerhearne.typeform.com/to/QpLJ4s');
+  return Redirect::away('https://tannerhearne.typeform.com/to/OwBODn');
 }]);
 
 Route::get('/hangout', array('as' => 'hangout', function()
 {
-  return Redirect::away('https://plus.google.com/events/c5ntekdiv2fd133r2smt40prqck');
+  return Redirect::away('https://plus.google.com/events/ct3s9qin5mcd7tpfnj6soheigbo');
 }));
 
 Route::get('/live', array('as' => 'hangout', function()
 {
-  return Redirect::away('https://plus.google.com/events/clie0k9fcfs5vgtmq8f0mfv8mu8');
+  return Redirect::away('https://plus.google.com/events/ct3s9qin5mcd7tpfnj6soheigbo");
 }));
 
 
