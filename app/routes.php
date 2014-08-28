@@ -40,7 +40,7 @@ Route::get('/hangout', array('as' => 'hangout', function()
 
 Route::get('/live', array('as' => 'hangout', function()
 {
-  return Redirect::away('https://plus.google.com/events/ct3s9qin5mcd7tpfnj6soheigbo");
+  return Redirect::away('https://plus.google.com/events/ct3s9qin5mcd7tpfnj6soheigbo');
 }));
 
 
