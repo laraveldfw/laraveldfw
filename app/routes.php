@@ -17,7 +17,7 @@ Route::get('/', function()
     'hidemap' => true,
     'locationname' => 'Google Hangouts',
     'locationurl' => 'https://plus.google.com/events/cudpuacki09mdnse9uuv9pm9cs4',
-    'datetime' => 'Thursday, October 2nd at 7:00pm',
+    'datetime' => 'Thursday, October 9th at 7:00pm',
     'speaker' => 'Osvaldo Brignoni',
     'speakerurl' => 'https://twitter.com/obrignoni',
     'speakerimg' => 'img/osvaldo-brignoni.jpg',
