@@ -16,12 +16,12 @@ Route::get('/', function()
   $data = [
     'hidemap' => true,
     'locationname' => 'Google Hangouts',
-    'locationurl' => 'https://plus.google.com/events/cudpuacki09mdnse9uuv9pm9cs4',
-    'datetime' => 'Thursday, October 9th at 7:00pm',
-    'speaker' => 'Osvaldo Brignoni',
-    'speakerurl' => 'https://twitter.com/obrignoni',
-    'speakerimg' => 'img/osvaldo-brignoni.jpg',
-    'talk' => 'Lexicon - an expressive template engine with extensible vocabulary'
+    'locationurl' => 'https://plus.google.com/events/cl7lrkuka6jvmmn267n0n2hkdak',
+    'datetime' => 'Thursday, November 6th at 7:00pm',
+    'speaker' => 'David Hemphill',
+    'speakerurl' => 'https://twitter.com/davidhemphill',
+    'speakerimg' => 'img/david-hemphill.jpg',
+    'talk' => 'Crafting Packages with Workbench'
   ];
 
   return View::make('home', compact('data'));
@@ -29,16 +29,16 @@ Route::get('/', function()
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://tannerhearne.typeform.com/to/Wm4Ygq');
+  return Redirect::away('https://tannerhearne.typeform.com/to/ASNFg2');
 }]);
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('https://plus.google.com/events/cudpuacki09mdnse9uuv9pm9cs4');
+  return Redirect::away('https://plus.google.com/events/cl7lrkuka6jvmmn267n0n2hkdak');
 }));
 
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/195798912/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/215415582/');
 }));
