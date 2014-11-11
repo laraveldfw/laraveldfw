@@ -15,13 +15,13 @@ Route::get('/', function()
 {
   $data = [
     'hidemap' => true,
-    'locationname' => 'Google Hangouts',
-    'locationurl' => 'https://plus.google.com/events/cl7lrkuka6jvmmn267n0n2hkdak',
-    'datetime' => 'Thursday, November 6th at 7:00pm',
-    'speaker' => 'David Hemphill',
-    'speakerurl' => 'https://twitter.com/davidhemphill',
-    'speakerimg' => 'img/david-hemphill.jpg',
-    'talk' => 'Crafting Packages with Workbench'
+    'locationname' => "Grimaldi's",
+    'locationurl' => 'https://plus.google.com/105284094880533822802/about?hl=en&gl=us',
+    'datetime' => 'Thursday, December 4th at 7:00pm',
+    'speaker' => 'Laravel DFW',
+    'speakerurl' => 'https://twitter.com/laraveldfw',
+    'speakerimg' => 'img/laravel-dfw-image.jpg',
+    'talk' => 'Conversation and Dinner'
   ];
 
   return View::make('home', compact('data'));
@@ -40,5 +40,5 @@ Route::get('/live', array('as' => 'live', function()
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/215415582/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/205009512/');
 }));
