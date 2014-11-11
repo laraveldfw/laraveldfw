@@ -14,7 +14,7 @@
 Route::get('/', function()
 {
   $data = [
-    'hidemap' => true,
+    'hidemap' => false,
     'locationname' => "Grimaldi's",
     'locationurl' => 'https://plus.google.com/105284094880533822802/about?hl=en&gl=us',
     'datetime' => 'Thursday, December 4th at 7:00pm',
