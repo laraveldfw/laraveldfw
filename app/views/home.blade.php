@@ -122,6 +122,9 @@
 
                   <!-- Ask Button -->
                   <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Ask Taylor a Question</a>
+
+                  <!-- Watch Live Button -->
+                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('live') }}" target="_blank">Watch Live</a>
                 </div>
               </div>
             </div>
