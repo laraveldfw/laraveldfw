@@ -20,7 +20,7 @@ Route::get('/', function()
     'datetime' => 'Thursday, January 8th at 7:00pm',
     'speaker' => 'Taylor Otwell',
     'speakerurl' => 'https://twitter.com/taylorotwell',
-    'speakerimg' => 'img/laravel-dfw-image.jpg',
+    'speakerimg' => 'img/taylor-otwell.jpg',
     'talk' => 'Live Q&A with Taylor Otwell'
   ];
 
