@@ -120,8 +120,8 @@
                   <!-- RSVP Button -->
                   <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="{{ route('rsvp') }}" target="_blank">RSVP Now!</a>
 
-                  {{-- <!-- Ask Button -->
-                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Submit A Question</a> --}}
+                  <!-- Ask Button -->
+                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Ask Taylor a Question</a>
                 </div>
               </div>
             </div>
