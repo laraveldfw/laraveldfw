@@ -14,14 +14,14 @@
 Route::get('/', function()
 {
   $data = [
-    'hidemap' => false,
-    'locationname' => "Grimaldi's",
-    'locationurl' => 'https://plus.google.com/105284094880533822802/about?hl=en&gl=us',
-    'datetime' => 'Thursday, December 4th at 7:00pm',
-    'speaker' => 'Laravel DFW',
-    'speakerurl' => 'https://twitter.com/laraveldfw',
+    'hidemap' => true,
+    'locationname' => "Google Hangouts",
+    'locationurl' => 'https://plus.google.com/events/c3ijiqs9siq3gjfegpc7g8fdk74',
+    'datetime' => 'Thursday, January 8th at 7:00pm',
+    'speaker' => 'Taylor Otwell',
+    'speakerurl' => 'https://twitter.com/taylorotwell',
     'speakerimg' => 'img/laravel-dfw-image.jpg',
-    'talk' => 'Conversation and Dinner'
+    'talk' => 'Live Q&A with Taylor Otwell'
   ];
 
   return View::make('home', compact('data'));
@@ -29,16 +29,16 @@ Route::get('/', function()
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://tannerhearne.typeform.com/to/ASNFg2');
+  return Redirect::away('https://tannerhearne.typeform.com/to/FyR6aK');
 }]);
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('https://plus.google.com/events/cl7lrkuka6jvmmn267n0n2hkdak');
+  return Redirect::away('https://plus.google.com/events/c3ijiqs9siq3gjfegpc7g8fdk74');
 }));
 
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/205009512/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/219083199/');
 }));
