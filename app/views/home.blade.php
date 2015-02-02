@@ -106,7 +106,7 @@
                   <img src="{{ asset($data['speakerimg']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
                 </div>
                 <div class="col-sm-9 feature-info">
-                  <h4>Next Meetup: <span class="meetup-date">{{ $data['datetime'] }} at <a href="{{ $data['locationurl'] }}" target="_blank">{{ $data['locationname'] }}</a></h4>
+                  <h4>Next Meetup: <span class="meetup-date">{{ $data['datetime'] }} on <a href="{{ $data['locationurl'] }}" target="_blank">{{ $data['locationname'] }}</a></h4>
 
                   <!-- Presentation Title -->
                   <h2>{{ $data['talk'] }}</h2>

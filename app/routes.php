@@ -18,7 +18,7 @@ Route::get('/', function()
     'locationname' => "Google Hangouts",
     'locationurl' => 'https://plus.google.com/events/cb7dpbs7tglv3d4u5jj2o5sec2o',
     'datetime' => 'Thursday, February 5th at 7:00pm',
-    'speaker' => 'Round Table Discussion',
+    'speaker' => 'Laravel DFW',
     'speakerurl' => 'https://twitter.com/laraveldfw',
     'speakerimg' => 'img/laravel-dfw-image.jpg',
     'talk' => 'Laravel 5 Round Table'
