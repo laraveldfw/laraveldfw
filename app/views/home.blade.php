@@ -115,13 +115,13 @@
                   <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speakerurl'] }}">{{ $data['speaker'] }}</a></h3>
 
                   <!-- Free Stuff Alert -->
-                  <div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div>
+                  {{--<div class="alert alert-danger"><strong>Want a free Laravel book?</strong><br>We are giving away <strong>free copies</strong> of <strong><a href="https://leanpub.com/codebright">Code Bright</a></strong> by <strong><a href="https://twitter.com/daylerees">Dayle Rees</a></strong> at this meetup!</div>--}}
 
                   <!-- RSVP Button -->
                   <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="{{ route('rsvp') }}" target="_blank">RSVP Now!</a>
 
                   <!-- Ask Button -->
-                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Ask Taylor a Question</a>
+                  <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Ask us a Question</a>
 
                   <!-- Watch Live Button -->
                   <a class="btn btn-lg btn-warning btn-header-action" data-toggle="modal" href="{{ route('live') }}" target="_blank">Watch Live</a>
