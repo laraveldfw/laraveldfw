@@ -18,7 +18,7 @@ Route::get('/', function()
     'locationname' => "Google Hangouts",
     'locationurl' => 'https://plus.google.com/events/c3c0e3qo8t6jtj476q8nrntshak',
     'datetime' => 'Thursday, April 9th at 7:00pm',
-    'speaker' => 'Laravel DFW',
+    'speaker' => 'Stuart Yamartino',
     'speakerurl' => 'https://twitter.com/stuyam',
     'speakerimg' => 'img/stuart-yamartino.jpg',
     'talk' => 'Laravel 5 in Action'
