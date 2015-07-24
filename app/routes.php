@@ -16,12 +16,12 @@ Route::get('/', function()
   $data = [
     'hidemap' => true,
     'locationname' => "Google Hangouts",
-    'locationurl' => 'https://plus.google.com/events/c3c0e3qo8t6jtj476q8nrntshak',
-    'datetime' => 'Thursday, April 9th at 7:00pm',
-    'speaker' => 'Stuart Yamartino',
-    'speakerurl' => 'https://twitter.com/stuyam',
-    'speakerimg' => 'img/stuart-yamartino.jpg',
-    'talk' => 'Laravel 5 in Action'
+    'locationurl' => 'https://plus.google.com/events/cfoef1v0dijvgjfknm25i04itoc',
+    'datetime' => 'Thursday, Augst 6th at 7:00pm',
+    'speaker' => 'Daniel Puente',
+    'speakerurl' => 'https://twitter.com/danielpuent3',
+    'speakerimg' => 'img/daniel-puente.jpg',
+    'talk' => 'Introducing Laravel 5'
   ];
 
   return View::make('home', compact('data'));
@@ -29,16 +29,16 @@ Route::get('/', function()
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://tannerhearne.typeform.com/to/MR8Nnt');
+  return Redirect::away('https://tannerhearne.typeform.com/to/YU80aa');
 }]);
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('https://plus.google.com/events/c3c0e3qo8t6jtj476q8nrntshak');
+  return Redirect::away('https://plus.google.com/events/cfoef1v0dijvgjfknm25i04itoc');
 }));
 
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/220953291/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/224087879/');
 }));
