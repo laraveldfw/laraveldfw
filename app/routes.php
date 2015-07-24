@@ -17,7 +17,7 @@ Route::get('/', function()
     'hidemap' => true,
     'locationname' => "Google Hangouts",
     'locationurl' => 'https://plus.google.com/events/cfoef1v0dijvgjfknm25i04itoc',
-    'datetime' => 'Thursday, Augst 6th at 7:00pm',
+    'datetime' => 'Thursday, August 6th at 7:00pm',
     'speaker' => 'Daniel Puente',
     'speakerurl' => 'https://twitter.com/danielpuent3',
     'speakerimg' => 'img/daniel-puente.jpg',
