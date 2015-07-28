@@ -16,7 +16,7 @@ Route::get('/', function()
   $data = [
     'hidemap' => true,
     'locationname' => "Google Hangouts",
-    'locationurl' => 'https://plus.google.com/events/cfoef1v0dijvgjfknm25i04itoc',
+    'locationurl' => 'https://plus.google.com/events/cb3sasch33du01ml7ven66qtilg',
     'datetime' => 'Thursday, August 6th at 7:00pm',
     'speaker' => 'Daniel Puente',
     'speakerurl' => 'https://twitter.com/danielpuent3',
@@ -34,7 +34,7 @@ Route::get('/ask', ['as' => 'ask', function()
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('https://plus.google.com/events/cfoef1v0dijvgjfknm25i04itoc');
+  return Redirect::away('https://plus.google.com/events/cb3sasch33du01ml7ven66qtilg');
 }));
 
 
