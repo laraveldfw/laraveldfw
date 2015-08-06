@@ -33,7 +33,7 @@ Route::get('/ask', ['as' => 'ask', function()
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('https://plus.google.com/events/cfoef1v0dijvgjfknm25i04itoc');
+  return Redirect::away('https://plus.google.com/events/cski7bqm7qev95nb50n2d0ug5to');
 }));
 
 
