@@ -15,7 +15,8 @@ Route::get('/', function () {
   $data = [
     'hidemap' => true,
     'locationname' => "Google Hangouts",
-    'locationurl' => 'https://plus.google.com/events/cski7bqm7qev95nb50n2d0ug5to',
+    //Correct link for the August 6th broadcast
+    'locationurl' => 'https://plus.google.com/u/0/events/cb3sasch33du01ml7ven66qtilg',
     'datetime' => 'Thursday, August 6th at 7:00pm',
     'speaker' => 'Daniel Puente',
     'speakerurl' => 'https://twitter.com/danielpuent3',
