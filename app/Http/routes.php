@@ -13,15 +13,14 @@
 
 Route::get('/', function () {
   $data = [
-    'hidemap' => true,
-    'locationname' => "Google Hangouts",
-    //Correct link for the August 6th broadcast
-    'locationurl' => 'https://plus.google.com/u/0/events/cb3sasch33du01ml7ven66qtilg',
-    'datetime' => 'Thursday, August 6th at 7:00pm',
-    'speaker' => 'Daniel Puente',
-    'speakerurl' => 'https://twitter.com/danielpuent3',
-    'speakerimg' => 'images/daniel-puente.jpg',
-    'talk' => 'Introducing Laravel 5'
+    'online' => false,
+    'locationname' => "Lupe&rsquo;s Tex Mex Grill",
+    'locationurl' => 'http://lupestxmx.com/#locations',
+    'datetime' => 'Wednesday, September 2nd at 7:00pm',
+    'speaker' => 'LaravelDFW',
+    'speakerurl' => 'http://www.laraveldfw.com',
+    'speakerimg' => 'images/laravel-dfw-image.jpg',
+    'talk' => 'Getting to Know Your Artisans!'
   ];
 
   return view('home', compact('data'));
@@ -40,5 +39,5 @@ Route::get('/live', array('as' => 'live', function()
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/224087879/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/224493977/');
 }));
