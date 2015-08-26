@@ -37,7 +37,7 @@
                 });
 
                 markerinfo = new google.maps.InfoWindow({
-                    content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">1401 William D Tate Avenue<br>Grapevine, TX 76051</p>'
+                    content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">2200 Airport Freeway<br/>Suite #505<br/>Bedford, TX 76022<br/>(817) 545-5004</p>'
                 });
                 markerinfo.open(map, marker);
 
