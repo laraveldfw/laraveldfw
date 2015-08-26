@@ -1,56 +1,58 @@
 @extends('layouts.default')
 
-@section('head')
-    <script type="text/javascript"
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJPjuNamTjqMr47aMldOQB9ZW2yXtfr-E&sensor=false">
-    </script>
-    <script type="text/javascript">
-        // Enable the visual refresh
-        google.maps.visualRefresh = true;
-        var map;
-        var lat = 32.925641;
-        var lon = -97.087305;
-        var laravelDFWLocation = new google.maps.LatLng(lat,lon);
+@if($data['online'] !== true)
+    @section('head')
+        <script type="text/javascript"
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJPjuNamTjqMr47aMldOQB9ZW2yXtfr-E&sensor=false">
+        </script>
+        <script type="text/javascript">
+            // Enable the visual refresh
+            google.maps.visualRefresh = true;
+            var map;
+            var lat = 32.925641;
+            var lon = -97.087305;
+            var laravelDFWLocation = new google.maps.LatLng(lat,lon);
 
-        lat = lat + 0.008
-        var mapCenterLocation = new google.maps.LatLng(lat,lon);
-        function initialize() {
-            var mapOptions = {
-                scrollwheel: false,
-                draggable: false,
-                center: mapCenterLocation,
-                zoom: 13,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var map = new google.maps.Map(document.getElementById("map-canvas"),
-                    mapOptions);
-            addMarker(laravelDFWLocation, map);
+            lat = lat + 0.008
+            var mapCenterLocation = new google.maps.LatLng(lat,lon);
+            function initialize() {
+                var mapOptions = {
+                    scrollwheel: false,
+                    draggable: false,
+                    center: mapCenterLocation,
+                    zoom: 13,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+                var map = new google.maps.Map(document.getElementById("map-canvas"),
+                        mapOptions);
+                addMarker(laravelDFWLocation, map);
 
-        }
+            }
 
-        // Function for adding a marker to the page.
-        function addMarker(location, map) {
-            marker = new google.maps.Marker({
-                position: location,
-                map: map
-            });
+            // Function for adding a marker to the page.
+            function addMarker(location, map) {
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
 
-            markerinfo = new google.maps.InfoWindow({
-                content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">1401 William D Tate Avenue<br>Grapevine, TX 76051</p>'
-            });
-            markerinfo.open(map, marker);
+                markerinfo = new google.maps.InfoWindow({
+                    content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">1401 William D Tate Avenue<br>Grapevine, TX 76051</p>'
+                });
+                markerinfo.open(map, marker);
 
-            google.maps.event.addListener(marker, 'click', (function(marker) {
-                return function() {
-                    markerinfo.open(map, marker);
-                }
-            })(marker));
-        }
+                google.maps.event.addListener(marker, 'click', (function(marker) {
+                    return function() {
+                        markerinfo.open(map, marker);
+                    }
+                })(marker));
+            }
 
-        google.maps.event.addDomListener(window, 'load', initialize);
+            google.maps.event.addDomListener(window, 'load', initialize);
 
-    </script>
-@stop
+        </script>
+    @stop
+@endif
 
 @section('content')
 
@@ -120,11 +122,13 @@
                                 <!-- RSVP Button -->
                                 <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="{{ route('rsvp') }}" target="_blank">RSVP Now!</a>
 
-                                <!-- Ask Button -->
-                                <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Ask us a Question</a>
+                                @if($data['online'] === true)
+                                    <!-- Ask Button -->
+                                    <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Ask us a Question</a>
 
-                                <!-- Watch Live Button -->
-                                <a class="btn btn-lg btn-warning btn-header-action" data-toggle="modal" href="{{ route('live') }}" target="_blank">Watch Live</a>
+                                    <!-- Watch Live Button -->
+                                    <a class="btn btn-lg btn-warning btn-header-action" data-toggle="modal" href="{{ route('live') }}" target="_blank">Watch Live</a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -133,7 +137,7 @@
         </div>
     </div>
     <div class="google-maps-wrapper">
-        @if($data['hidemap'] == true)
+        @if($data['online'] === true)
             <h3 class="text-center">
                 <i class="icon-location-arrow"></i>
                 This Meetup is on Google Hangouts!
