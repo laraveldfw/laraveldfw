@@ -13,14 +13,14 @@
 
 Route::get('/', function () {
   $data = [
-    'online' => false,
-    'locationname' => "Lupe&rsquo;s Tex Mex Grill",
-    'locationurl' => 'http://lupestxmx.com/#locations',
-    'datetime' => 'Wednesday, September 2nd at 7:00pm',
-    'speaker' => 'LaravelDFW',
+    'online' => true,
+    'locationname' => "YouTube Live Stream",
+    'locationurl' => 'http://www.youtube.com/watch?v=DAwx-MrlYmE',
+    'datetime' => 'Thursday, October 1st at 7:00pm',
+    'speaker' => 'LaravelDFW Organizers',
     'speakerurl' => 'http://www.laraveldfw.com',
     'speakerimg' => 'images/laravel-dfw-image.jpg',
-    'talk' => 'Getting to Know Your Artisans!'
+    'talk' => 'How We Upgraded to Laravel 5, Use GitHub, and Auto-deploy with Forge'
   ];
 
   return view('home', compact('data'));
@@ -28,12 +28,12 @@ Route::get('/', function () {
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://tannerhearne.typeform.com/to/YU80aa');
+  return Redirect::away('https://tannerhearne.typeform.com/to/fjgRPg');
 }]);
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('https://plus.google.com/u/0/events/cb3sasch33du01ml7ven66qtilg');
+  return Redirect::away('http://www.youtube.com/watch?v=DAwx-MrlYmE');
 }));
 
 
