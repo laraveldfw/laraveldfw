@@ -13,7 +13,7 @@
             var lon = -97.132664;
             var laravelDFWLocation = new google.maps.LatLng(lat,lon);
 
-            lat = lat + 0.008
+            lat = lat + 0.008;
             var mapCenterLocation = new google.maps.LatLng(lat,lon);
             function initialize() {
                 var mapOptions = {
