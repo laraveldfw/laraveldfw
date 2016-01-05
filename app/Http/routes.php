@@ -14,9 +14,9 @@
 Route::get('/', function () {
   $data = [
     'online' => false,
-    'locationname' => "Fuddrucker&rsquo;s, Bedford, TX",
-    'locationurl' => 'https://goo.gl/maps/2ZBJhbWUEXT2',
-    'datetime' => 'Thursday, November 5th at 7:00pm',
+    'locationname' => "Lupe&rsquo;s TexMex Grill",
+    'locationurl' => 'http://lupestxmx.com/',
+    'datetime' => 'Thursday, January 7th at 7:00pm',
     'speaker' => 'LaravelDFW Organizers',
     'speakerurl' => 'http://www.laraveldfw.com',
     'speakerimg' => 'images/laravel-dfw-image.jpg',
@@ -39,5 +39,5 @@ Route::get('/live', array('as' => 'live', function()
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/226434027/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/227225922/');
 }));
