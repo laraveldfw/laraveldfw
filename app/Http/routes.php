@@ -15,6 +15,8 @@ Route::get('/', function () {
   $data = [
     'online' => false,
     'locationname' => "Lupe&rsquo;s TexMex Grill",
+    'locationaddress' => "2200 Airport Fwy Suite 505, Bedford, TX 76022",
+    'locationphone' => "(817) 545-5004",
     'locationurl' => 'http://lupestxmx.com/',
     'datetime' => 'Thursday, January 7th at 7:00pm',
     'speaker' => 'LaravelDFW Organizers',

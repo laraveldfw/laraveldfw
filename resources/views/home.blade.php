@@ -37,7 +37,7 @@
                 });
 
                 markerinfo = new google.maps.InfoWindow({
-                    content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">1612 Airport Fwy, Bedford, TX 76022<br/>(817) 494-9990</p>'
+                    content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">{{{ $data['locationaddress'] }}}<br/>{{{ $data['locationphone'] }}}</p>'
                 });
                 markerinfo.open(map, marker);
 
