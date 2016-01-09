@@ -11,3 +11,5 @@ laraveldfw.com/package.json
 .idea
 vendor/
 .vagrant
+Homestead.yaml
+Vagrantfile
