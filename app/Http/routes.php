@@ -13,16 +13,16 @@
 
 Route::get('/', function () {
   $data = [
-    'online' => false,
-    'locationname' => "Lupe&rsquo;s TexMex Grill",
-    'locationaddress' => "2200 Airport Fwy Suite 505, Bedford, TX 76022",
-    'locationphone' => "(817) 545-5004",
-    'locationurl' => 'http://lupestxmx.com/',
-    'datetime' => 'Thursday, January 7th at 7:00pm',
+    'online' => true,
+    'locationname' => 'Google Hangouts',
+    'locationaddress' => 'n/a',
+    'locationphone' => 'n/a',
+    'locationurl' => 'http://www.youtube.com/watch?v=DAwx-MrlYmE',
+    'datetime' => 'Thursday, February 4th at 7:00pm',
     'speaker' => 'LaravelDFW Organizers',
     'speakerurl' => 'http://www.laraveldfw.com',
     'speakerimg' => 'images/laravel-dfw-image.jpg',
-    'talk' => 'Getting to know your fellow Artisans!'
+    'talk' => 'Building APIs with Lumen'
   ];
 
   return view('home', compact('data'));
@@ -41,5 +41,5 @@ Route::get('/live', array('as' => 'live', function()
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/227225922/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/228334352/');
 }));
