@@ -30,7 +30,7 @@ Route::get('/', function () {
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://tannerhearne.typeform.com/to/fjgRPg');
+  return Redirect::away('https://tannerhearne.typeform.com/to/oGBGRZ');
 }]);
 
 Route::get('/live', array('as' => 'live', function()
