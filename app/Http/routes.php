@@ -17,7 +17,7 @@ Route::get('/', function () {
     'locationname' => 'Google Hangouts',
     'locationaddress' => 'n/a',
     'locationphone' => 'n/a',
-    'locationurl' => 'http://www.youtube.com/watch?v=DAwx-MrlYmE',
+    'locationurl' => 'http://www.youtube.com/watch?v=br2O_WDXaKk',
     'datetime' => 'Thursday, February 4th at 7:00pm',
     'speaker' => 'LaravelDFW Organizers',
     'speakerurl' => 'http://www.laraveldfw.com',
@@ -35,7 +35,7 @@ Route::get('/ask', ['as' => 'ask', function()
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('http://www.youtube.com/watch?v=DAwx-MrlYmE');
+  return Redirect::away('http://www.youtube.com/watch?v=br2O_WDXaKk');
 }));
 
 
