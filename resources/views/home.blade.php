@@ -129,6 +129,10 @@
                                     <!-- Watch Live Button -->
                                     <a class="btn btn-lg btn-warning btn-header-action" data-toggle="modal" href="{{ route('live') }}" target="_blank">Watch Live</a>
                                 @endif
+
+                                <!-- Slack Invite Button -->
+                                <a class="btn btn-lg btn-info btn-header-action" data-toggle="modal" href="{{ route('slack') }}" target="_blank">Slack Invite</a>
+
                             </div>
                         </div>
                     </div>

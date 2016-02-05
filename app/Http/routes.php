@@ -43,3 +43,8 @@ Route::get('/rsvp', array('as' => 'rsvp', function()
 {
   return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/228334352/');
 }));
+
+Route::get('/slack', array('as' => 'slack', function()
+{
+    return Redirect::away('https://laraveldfw.typeform.com/to/UGKpb8');
+}));
