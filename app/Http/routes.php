@@ -38,7 +38,6 @@ Route::get('/live', array('as' => 'live', function()
   return Redirect::away('http://www.youtube.com/watch?v=br2O_WDXaKk');
 }));
 
-
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
   return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/228334352/');
@@ -48,3 +47,8 @@ Route::get('/slack', array('as' => 'slack', function()
 {
     return Redirect::away('https://laraveldfw.typeform.com/to/UGKpb8');
 }));
+
+Route::get('/tell-us-about-you', ['as' => 'tellusaboutyou', function()
+{
+  return Redirect::away('https://docs.google.com/forms/d/1CVmWQdQEV91b5nPwlE4k2lmIyDKzjrhe0P0CTgjK2YA/viewform');
+}]);
