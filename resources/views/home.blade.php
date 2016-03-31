@@ -9,8 +9,8 @@
             // Enable the visual refresh
             google.maps.visualRefresh = true;
             var map;
-            var lat = 32.836084;
-            var lon = -97.139847;
+            var lat = 32.966190;
+            var lon = -96.820111;
             var laravelDFWLocation = new google.maps.LatLng(lat,lon);
 
             lat = lat + 0.008
