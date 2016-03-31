@@ -14,15 +14,16 @@
 Route::get('/', function () {
   $data = [
     'online' => false,
-    'locationname' => 'Jibaritos',
-    'locationaddress' => '2855 Central Dr, Bedford, TX 76021',
-    'locationphone' => '(817) 684-4077',
-    'locationurl' => 'https://www.google.com/maps/place/Jibaritos+Restaurant/@32.8513353,-97.1357193,17z/data=!3m1!4b1!4m2!3m1!1s0x864e7fa1b4ebdd61:0xaa49f8dfaaf52326',
-    'datetime' => 'Thursday, March 3rd at 7:00pm',
-    'speaker' => 'LaravelDFW Organizers',
-    'speakerurl' => 'http://www.laraveldfw.com',
-    'speakerimg' => 'images/laravel-dfw-image.jpg',
-    'talk' => 'Face-to-face with your fellow Artisans!'
+    'locationname' => 'Axxess',
+    'locationaddress' => '16000 Dallas Parkway, Suite 700, Dallas, TX',
+    'locationphone' => '',
+    'locationurl' => 'https://goo.gl/maps/Ra4dCc1FvYm',
+    'datetime' => 'Thursday, April 7th at 7:00pm',
+    'speaker' => 'Nathan Barrett',
+    'speakerurl' => 'https://www.linkedin.com/in/nathan-barrett-06b91512',
+    'speakerimg' => 'images/nathan-barrett.jpg',
+    'talk' => 'Custom forms with Laravel and Angular 1.x',
+    'additionalinfo' => 'Taylor Ottwell will be attending this MeetUp in-person! And we&rsquo;ll be right next door to the Lone Star PHP conference!'
   ];
 
   return view('home', compact('data'));
@@ -40,7 +41,7 @@ Route::get('/live', array('as' => 'live', function()
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/228334352/');
+  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/229426053/');
 }));
 
 Route::get('/slack', array('as' => 'slack', function()
