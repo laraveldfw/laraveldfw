@@ -23,7 +23,7 @@ Route::get('/', function () {
     'speakerurl' => 'https://www.linkedin.com/in/nathan-barrett-06b91512',
     'speakerimg' => 'images/nathan-barrett.jpg',
     'talk' => 'Custom forms with Laravel and Angular 1.x',
-    'additionalinfo' => 'Taylor Ottwell will be attending this MeetUp in-person! And we&rsquo;ll be right next door to the Lone Star PHP conference!'
+    'additionalinfo' => 'Taylor Otwell will also be joining this month in-person! And we&rsquo;ll be right next door to the Lone Star PHP conference!'
   ];
 
   return view('home', compact('data'));
