@@ -131,7 +131,7 @@
                                 @endif
 
                                 <!-- Slack Invite Button -->
-                                <a class="btn btn-lg btn-info btn-header-action" data-toggle="modal" href="{{ route('slack') }}" target="_blank">Slack Invite</a>
+                                <a class="btn btn-lg btn-info btn-header-action" data-toggle="modal" href="{{ route('slack') }}" target="_blank">Join our Slack Group</a>
 
                             </div>
                         </div>
