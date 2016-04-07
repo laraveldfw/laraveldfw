@@ -31,12 +31,12 @@ Route::get('/', function () {
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://tannerhearne.typeform.com/to/oGBGRZ');
+  return Redirect::away('https://www.twitter.com/laraveldfw');
 }]);
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('http://www.youtube.com/watch?v=br2O_WDXaKk');
+  return Redirect::away('http://www.youtube.com/watch?v=yQiqYWIFE-w');
 }));
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
