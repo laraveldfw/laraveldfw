@@ -9,8 +9,8 @@
             // Enable the visual refresh
             google.maps.visualRefresh = true;
             var map;
-            var lat = 32.966190;
-            var lon = -96.820111;
+            var lat = {{ $data['locationlatitude'] }};
+            var lon = {{ $data['locationlongitude'] }};
             var laravelDFWLocation = new google.maps.LatLng(lat,lon);
 
             lat = lat + 0.008
@@ -105,7 +105,11 @@
                     <div class="container">
                         <div class="row feature-content">
                             <div class="col-sm-3">
-                                <img src="{{ asset($data['speakerimg']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
+                                @if(isset($data['speakerimg']) && !empty($data['speakerimg']))
+                                    <img src="{{ asset($data['speakerimg']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
+                                @else
+                                    <img src="{{ asset('images/laravel-dfw-image.jpg') }}" alt="LaravelDFW" class="img-circle feature-speaker-image">
+                                @endif
                             </div>
                             <div class="col-sm-9 feature-info">
                                 <h4>Next Meetup: <span class="meetup-date">{{ $data['datetime'] }} {{ ($data['online'])?'on':'at' }} <a href="{{ $data['locationurl'] }}" target="_blank">{{ $data['locationname'] }}</a></span></h4>
@@ -114,10 +118,15 @@
                                 <h2>{{ $data['talk'] }}</h2>
 
                                 <!-- Presented By -->
-                                <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speakerurl'] }}" target="_blank">{{ $data['speaker'] }}</a></h3>
-
+                                @if(isset($data['speaker']) && !empty($data['speaker']))
+                                    <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speakerurl'] }}" target="_blank">{{ $data['speaker'] }}</a></h3>
+                                @else
+                                    <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="http://www.laraveldfw.com">LaravelDFW</a></h3>
+                                @endif
                                 <!-- Free Stuff Alert -->
-                                <div class="alert alert-warning"><strong>{{ $data['additionalinfo'] }}</strong></div>
+                                @if(isset($data['additionalinfo']) && !empty($data['additionalinfo']))
+                                    <div class="alert alert-warning"><strong>{{ $data['additionalinfo'] }}</strong></div>
+                                @endif
 
                                 <!-- RSVP Button -->
                                 <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="{{ route('rsvp') }}" target="_blank">RSVP Now!</a>
