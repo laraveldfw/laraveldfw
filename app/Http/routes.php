@@ -18,6 +18,8 @@ Route::get('/', function () {
     'locationaddress' => '2200 Airport Freeway, Suite #505, Bedford, TX 76022',
     'locationphone' => '(817) 545-5004',
     'locationurl' => 'http://www.lupestxmx.com/',
+    'locationlatitude' => 32.834653,
+    'locationlongitude' => -97.132119,
     'datetime' => 'Thursday, May 5th at 7:00pm',
     'talk' => 'In-person MeetUp!',
     'speaker' => '',
