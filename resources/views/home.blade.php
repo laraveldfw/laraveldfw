@@ -124,7 +124,9 @@
                                     <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="http://www.laraveldfw.com">LaravelDFW</a></h3>
                                 @endif
                                 <!-- Free Stuff Alert -->
-                                <div class="alert alert-warning"><strong>{{ $data['additionalinfo'] }}</strong></div>
+                                @if(isset($data['additionalinfo']) && !empty($data['additionalinfo']))
+                                    <div class="alert alert-warning"><strong>{{ $data['additionalinfo'] }}</strong></div>
+                                @endif
 
                                 <!-- RSVP Button -->
                                 <a class="btn btn-lg btn-danger btn-header-action" data-toggle="modal" href="{{ route('rsvp') }}" target="_blank">RSVP Now!</a>

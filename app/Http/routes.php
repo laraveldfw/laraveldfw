@@ -14,7 +14,6 @@
 Route::get('/', function () {
   $data = [
     'online' => false,
-    'additionalinfo' => 'Taylor Otwell will also be joining this month in-person! And we&rsquo;ll be right next door to the Lone Star PHP conference!'
     'locationname' => 'Lupe&rsquo;s TexMex Grill',
     'locationaddress' => '2200 Airport Freeway, Suite #505, Bedford, TX 76022',
     'locationphone' => '(817) 545-5004',
@@ -24,6 +23,7 @@ Route::get('/', function () {
     'speaker' => '',
     'speakerimg' => '',
     'speakerurl' => '',
+    'additionalinfo' => '',
   ];
 
   return view('home', compact('data'));
