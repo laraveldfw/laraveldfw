@@ -105,7 +105,11 @@
                     <div class="container">
                         <div class="row feature-content">
                             <div class="col-sm-3">
-                                <img src="{{ asset($data['speakerimg']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
+                                @if(isset($data['speakerimg']) && !empty($data['speakerimg']))
+                                    <img src="{{ asset($data['speakerimg']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
+                                @else
+                                    <img src="{{ asset('images/laravel-dfw-image.jpg') }}" alt="LaravelDFW" class="img-circle feature-speaker-image">
+                                @endif
                             </div>
                             <div class="col-sm-9 feature-info">
                                 <h4>Next Meetup: <span class="meetup-date">{{ $data['datetime'] }} {{ ($data['online'])?'on':'at' }} <a href="{{ $data['locationurl'] }}" target="_blank">{{ $data['locationname'] }}</a></span></h4>
@@ -114,8 +118,11 @@
                                 <h2>{{ $data['talk'] }}</h2>
 
                                 <!-- Presented By -->
-                                <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speakerurl'] }}" target="_blank">{{ $data['speaker'] }}</a></h3>
-
+                                @if(isset($data['speaker']) && !empty($data['speaker']))
+                                    <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speakerurl'] }}" target="_blank">{{ $data['speaker'] }}</a></h3>
+                                @else
+                                    <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="http://www.laraveldfw.com">LaravelDFW</a></h3>
+                                @endif
                                 <!-- Free Stuff Alert -->
                                 <div class="alert alert-warning"><strong>{{ $data['additionalinfo'] }}</strong></div>
 
