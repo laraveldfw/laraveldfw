@@ -90,6 +90,7 @@
                                     <li><a href="https://twitter.com/laracasts" target="_blank">@laracasts</a></li>
                                 </ul>
                             </li>
+                            <li><a href="/login" target="_self">Admins</a></li>
                         </ul>
                     </div>
                 </div>
