@@ -73,3 +73,15 @@ Route::get('/getEnv', function () {
         'env' => env('APP_ENV'),
     ]);
 });
+
+
+Route::group(['middleware' => ['auth']], function () {
+    
+    Route::get('/getAllUsers', 'LoginController@getAllUsers');
+    
+    Route::get('/dashboard', 'DashboardController@show');
+    Route::get('/getAllMeetups', 'DashboardController@getAllMeetups');
+    Route::post('/saveNewMeetup', 'DashboardController@saveNewMeetup');
+    
+    
+});

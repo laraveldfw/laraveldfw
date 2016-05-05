@@ -4,6 +4,7 @@
     <section ng-app="LoginApp">
         <form name="loginForm"
               novalidate
+              ng-cloak
               ng-controller="LoginController"
               ng-submit="login(loginForm)">
             <div flex="100"

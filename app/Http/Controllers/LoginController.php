@@ -44,13 +44,10 @@ class LoginController extends Controller
      */
     public function checkAuth()
     {
-        if(Auth::user()){
-            return response()->json([
-                'success' => true,
-                'user' => Auth::user()->toArray(),
-            ]);
-        }
-        abort(400);
+        return response()->json([
+            'success' => Auth::check(),
+            'user' => Auth::check() ? Auth::user()->toArray() : null,
+        ]);
     }
 
     /**
@@ -75,6 +72,14 @@ class LoginController extends Controller
         
         return response()->json([
             'success' => true,
+        ]);
+    }
+
+    public function getAllUsers()
+    {
+        return response()->json([
+            'success' => true,
+            'users' => User::all()->toArray(),
         ]);
     }
 

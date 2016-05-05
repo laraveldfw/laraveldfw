@@ -36,7 +36,7 @@ function AuthService($http, $location, ExceptionService) {
             .then(function (response) {
                 if(response.data.success){
                     if(redirect){
-                        $location.url(redirect);
+                        window.location.assign(redirect);
                     }
                     user = response.data.user;
                     return user;
@@ -75,6 +75,14 @@ function AuthService($http, $location, ExceptionService) {
     
     self.getEmailRegex = function () {
         return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    };
+    
+    self.getAllUsers = function () {
+        return $http.get('/getAllUsers').then(function (response) {
+            if(response.data.success){
+                return response.data.users;
+            }
+        });
     };
 
     /****  Private Functions  ****/

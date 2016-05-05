@@ -21,8 +21,8 @@ class CreateMeetupsTable extends Migration
             $table->string('location_address')->nullable();
             $table->string('location_phone')->nullable();
             $table->string('location_url')->nullable();
-            $table->float('location_lat', 11, 8)->nullable();
-            $table->float('location_lng', 11, 8)->nullable();
+            $table->float('location_lat', 10, 8)->nullable();
+            $table->float('location_lng', 10, 8)->nullable();
             $table->string('talk');
             $table->string('speaker')->nullable();
             $table->string('speaker_img')->nullable();

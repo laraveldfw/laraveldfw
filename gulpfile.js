@@ -35,11 +35,30 @@ elixir(function(mix) {
             'angular/pages/login.controller.js',
             'angular/pages/login.app.js'
         ], 'public/js/login.js')
+            
+        // create dashboard.js
+        .scripts([
+            './node_modules/moment/moment.js',
+            'angular/directives/ngAutocomplete.js',
+            'angular/directives/ngMaterialDatetimePicker.js',
+            'angular/services/auth.service.js',
+            'angular/services/exception.service.js',
+            'angular/services/meetup.service.js',
+            'angular/pages/dashboard.controller.js',
+            'angular/pages/dashboard.app.js'
+        ], 'public/js/dashboard.js')
+            
+        // create dashboard.css
+        .styles([
+            'material-datetimepicker.css'
+        ], 'public/css/dashboard.css')
     
     
         // version files
         .version([
             'public/js/material.js',
-            'public/js/login.js'
+            'public/js/login.js',
+            'public/js/dashboard.js',
+            'public/css/dashboard.css'
         ]);
 });
