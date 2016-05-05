@@ -15,7 +15,7 @@
             </md-content>
         </md-sidenav>
         <md-content flex layout-padding>
-            <h3 class="md-title">Content Here</h3>
+            @include('_dashboard.newMeetup')
         </md-content>
     </div>
 </section>
@@ -26,5 +26,6 @@
     @endsection
 
 @section('footerScripts')
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_API_KEY') }}&libraries=places"></script>
     <script src="{{ elixir('js/dashboard.js') }}" type="text/javascript"></script>
     @endsection

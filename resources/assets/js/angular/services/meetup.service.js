@@ -21,7 +21,8 @@ function MeetupService ($http) {
     
     
     /****  Public Functions  ****/
-    
+    self.getAllMeetups = getAllMeetups;
+    self.saveNewMeetup = saveNewMeetup;
     
     /****  Private Functions  ****/
     
