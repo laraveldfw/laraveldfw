@@ -11,6 +11,9 @@
 |
 */
 
+Route::get('/', 'HomeController@show');
+
+/*
 Route::get('/', function () {
   $data = [
     'online' => false,
@@ -30,6 +33,7 @@ Route::get('/', function () {
 
   return view('home', compact('data'));
 });
+*/
 
 Route::get('/ask', ['as' => 'ask', function()
 {

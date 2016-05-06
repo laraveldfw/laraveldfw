@@ -1,14 +1,14 @@
 /*
  * Angular service for exception handling and reporting
  *
- * @params none
+ * @params $log, $http, $mdDialog, $mdToast
  *
  * @returns none
  */
 
-ExceptionService.$inject = ['$log', '$http'];
+ExceptionService.$inject = ['$log', '$http', '$mdDialog', '$mdToast'];
 
-function ExceptionService($log, $http) {
+function ExceptionService($log, $http, $mdDialog, $mdToast) {
 
     var self = this;
 
@@ -109,6 +109,38 @@ function ExceptionService($log, $http) {
      */
     function errorResponse (response) {
         $log.error('error response', response);
+        if(modes[env].errorModal){
+            if(angular.isString(response.data)){
+                showDebugInfo(response.data);
+            }
+            else if(angular.isObject(response.data)){
+                var toastString = 'Error: ';
+                angular.forEach(response.data, function (value, key) {
+                    if(angular.isArray(value)){
+                        for (var i = 0; i < value.length; i++) {
+                            toastString += value[i] + ' | ';
+                        }
+                    }
+                });
+                $mdToast.showSimple(toastString);
+            }
+        }
+    }
+
+    /*
+    * Renders a dialog on the screen with debug details
+    *
+    * @params error html string
+    *
+    * @returns $mdDialog promise
+    */
+    function showDebugInfo (errorHtml) {
+        return $mdDialog.show({
+            parent: angular.element(document.body),
+            template: errorHtml,
+            clickOutsideToClose: true,
+            fullscreen: true
+        });
     }
 
 }

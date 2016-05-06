@@ -5,14 +5,14 @@
 *
 * @returns none
 */
-MeetupService.$inject = ['$http'];
+MeetupService.$inject = ['$http', 'ExceptionService', '$mdToast', '$mdDialog'];
 
-function MeetupService ($http) {
+function MeetupService ($http, ExceptionService, $mdToast, $mdDialog) {
     
     var self = this;
     
     /****  Private Variables  ****/
-    var meetups = null;
+    var meetups = [];
     
     /****  Public Variables  ****/
     
@@ -57,9 +57,29 @@ function MeetupService ($http) {
             }
         }
         if(typeof meetup.start_time.getMonth === 'function'){
-            meetup.start_time = meetup.start_time.toISOString();
+            var formattedDate = meetup.start_time.toISOString();
+            formattedDate = formattedDate.slice(0, 19);
+            formattedDate = formattedDate.replace('T', ' ');
+            meetup.start_time = formattedDate;
         }
-        
-        return $http.post('/saveNewMeetup', meetup);
+
+        return $http.post('/saveNewMeetup', meetup)
+            .then(function (response) {
+                if(response.data.success){
+                    meetups.push(response.data.meetups);
+                    $mdDialog.show(
+                        $mdDialog.alert()
+                            .parent(angular.element(document.body))
+                            .clickOutsideToClose(true)
+                            .title('Meetup Saved')
+                            .textContent('The main page will show this meetup now.')
+                            .ok('Got It!')
+                    );
+                    return response.data.meetup;
+                }
+            }, function (error) {
+                ExceptionService.errorResponse(error);
+                return error;
+            })
     }    
 }

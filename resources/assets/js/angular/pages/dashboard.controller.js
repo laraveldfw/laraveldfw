@@ -8,7 +8,10 @@
 DashboardController.$inject = ['$scope', 'AuthService', 'MeetupService'];
 
 function DashboardController ($scope, AuthService, MeetupService) {
-    
+
+    $scope.meetup = {
+        online: false
+    };
     
     $scope.$watch('placeDetails', function (details) {
         if(angular.isObject(details)){
@@ -16,14 +19,14 @@ function DashboardController ($scope, AuthService, MeetupService) {
             $scope.meetup.location_address = details.formatted_address;
             $scope.meetup.location_phone = details.formatted_phone_number;
             if(details.geometry){
-                $scope.meetup.location_lat = details.geometry.location.lat();
-                $scope.meetup.location_lng = details.geometry.location.lng();
+                $scope.meetup.location_lat = parseFloat(details.geometry.location.lat());
+                $scope.meetup.location_lng = parseFloat(details.geometry.location.lng());
             }
             $scope.meetup.location_url = details.website;
         }
     });
     
-    $scope.createNewMeetup = function () {
+    $scope.createNewMeetup = function (newMeetupForm) {
         $scope.savingNewMeetup = true;
         var meetup;
         if($scope.meetup.online){
@@ -45,9 +48,13 @@ function DashboardController ($scope, AuthService, MeetupService) {
             meetup = angular.copy($scope.meetup);
         }
         
-        MeetupService.saveNewMeetup(meetup).then(function () {
-            $scope.meetup = {};
+        MeetupService.saveNewMeetup(meetup).then(function (savedMeetup) {
+            $scope.meetup = {
+                online: false
+            };
             $scope.savingNewMeetup = false;
+            newMeetupForm.$setUntouched();
+            newMeetupForm.$setPristine();
         });
     };
 }

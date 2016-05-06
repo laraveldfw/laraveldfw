@@ -46,7 +46,7 @@ class DashboardController extends Controller
         ]);
 
         return response()->json([
-            'succees' => true,
+            'success' => true,
             'meetup' => $meetup->toArray(),
         ]);
     }

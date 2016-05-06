@@ -6,9 +6,9 @@
  * @returns none
  */
 
-AuthService.$inject = ['$http', '$location', 'ExceptionService'];
+AuthService.$inject = ['$http', '$location', 'ExceptionService', '$mdToast'];
 
-function AuthService($http, $location, ExceptionService) {
+function AuthService($http, $location, ExceptionService, $mdToast) {
 
     var self = this;
 
@@ -40,6 +40,10 @@ function AuthService($http, $location, ExceptionService) {
                     }
                     user = response.data.user;
                     return user;
+                }
+                else{
+                    $mdToast.showSimple('Email/Password combo not found');
+                    return false;
                 }
             }, function (error) {
                 ExceptionService.errorResponse(error);

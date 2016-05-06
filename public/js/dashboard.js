@@ -5103,9 +5103,9 @@ angular.module( "ngAutocomplete", [])
  * @returns none
  */
 
-AuthService.$inject = ['$http', '$location', 'ExceptionService'];
+AuthService.$inject = ['$http', '$location', 'ExceptionService', '$mdToast'];
 
-function AuthService($http, $location, ExceptionService) {
+function AuthService($http, $location, ExceptionService, $mdToast) {
 
     var self = this;
 
@@ -5137,6 +5137,10 @@ function AuthService($http, $location, ExceptionService) {
                     }
                     user = response.data.user;
                     return user;
+                }
+                else{
+                    $mdToast.showSimple('Email/Password combo not found');
+                    return false;
                 }
             }, function (error) {
                 ExceptionService.errorResponse(error);
@@ -5201,14 +5205,14 @@ function AuthService($http, $location, ExceptionService) {
 /*
  * Angular service for exception handling and reporting
  *
- * @params none
+ * @params $log, $http, $mdDialog, $mdToast
  *
  * @returns none
  */
 
-ExceptionService.$inject = ['$log', '$http'];
+ExceptionService.$inject = ['$log', '$http', '$mdDialog', '$mdToast'];
 
-function ExceptionService($log, $http) {
+function ExceptionService($log, $http, $mdDialog, $mdToast) {
 
     var self = this;
 
@@ -5309,6 +5313,38 @@ function ExceptionService($log, $http) {
      */
     function errorResponse (response) {
         $log.error('error response', response);
+        if(modes[env].errorModal){
+            if(angular.isString(response.data)){
+                showDebugInfo(response.data);
+            }
+            else if(angular.isObject(response.data)){
+                var toastString = 'Error: ';
+                angular.forEach(response.data, function (value, key) {
+                    if(angular.isArray(value)){
+                        for (var i = 0; i < value.length; i++) {
+                            toastString += value[i] + ' | ';
+                        }
+                    }
+                });
+                $mdToast.showSimple(toastString);
+            }
+        }
+    }
+
+    /*
+    * Renders a dialog on the screen with debug details
+    *
+    * @params error html string
+    *
+    * @returns $mdDialog promise
+    */
+    function showDebugInfo (errorHtml) {
+        return $mdDialog.show({
+            parent: angular.element(document.body),
+            template: errorHtml,
+            clickOutsideToClose: true,
+            fullscreen: true
+        });
     }
 
 }
@@ -5319,14 +5355,14 @@ function ExceptionService($log, $http) {
 *
 * @returns none
 */
-MeetupService.$inject = ['$http'];
+MeetupService.$inject = ['$http', 'ExceptionService', '$mdToast', '$mdDialog'];
 
-function MeetupService ($http) {
+function MeetupService ($http, ExceptionService, $mdToast, $mdDialog) {
     
     var self = this;
     
     /****  Private Variables  ****/
-    var meetups = null;
+    var meetups = [];
     
     /****  Public Variables  ****/
     
@@ -5371,10 +5407,30 @@ function MeetupService ($http) {
             }
         }
         if(typeof meetup.start_time.getMonth === 'function'){
-            meetup.start_time = meetup.start_time.toISOString();
+            var formattedDate = meetup.start_time.toISOString();
+            formattedDate = formattedDate.slice(0, 19);
+            formattedDate = formattedDate.replace('T', ' ');
+            meetup.start_time = formattedDate;
         }
-        
-        return $http.post('/saveNewMeetup', meetup);
+
+        return $http.post('/saveNewMeetup', meetup)
+            .then(function (response) {
+                if(response.data.success){
+                    meetups.push(response.data.meetups);
+                    $mdDialog.show(
+                        $mdDialog.alert()
+                            .parent(angular.element(document.body))
+                            .clickOutsideToClose(true)
+                            .title('Meetup Saved')
+                            .textContent('The main page will show this meetup now.')
+                            .ok('Got It!')
+                    );
+                    return response.data.meetup;
+                }
+            }, function (error) {
+                ExceptionService.errorResponse(error);
+                return error;
+            })
     }    
 }
 /*
@@ -5387,7 +5443,10 @@ function MeetupService ($http) {
 DashboardController.$inject = ['$scope', 'AuthService', 'MeetupService'];
 
 function DashboardController ($scope, AuthService, MeetupService) {
-    
+
+    $scope.meetup = {
+        online: false
+    };
     
     $scope.$watch('placeDetails', function (details) {
         if(angular.isObject(details)){
@@ -5395,14 +5454,14 @@ function DashboardController ($scope, AuthService, MeetupService) {
             $scope.meetup.location_address = details.formatted_address;
             $scope.meetup.location_phone = details.formatted_phone_number;
             if(details.geometry){
-                $scope.meetup.location_lat = details.geometry.location.lat();
-                $scope.meetup.location_lng = details.geometry.location.lng();
+                $scope.meetup.location_lat = parseFloat(details.geometry.location.lat());
+                $scope.meetup.location_lng = parseFloat(details.geometry.location.lng());
             }
             $scope.meetup.location_url = details.website;
         }
     });
     
-    $scope.createNewMeetup = function () {
+    $scope.createNewMeetup = function (newMeetupForm) {
         $scope.savingNewMeetup = true;
         var meetup;
         if($scope.meetup.online){
@@ -5424,9 +5483,13 @@ function DashboardController ($scope, AuthService, MeetupService) {
             meetup = angular.copy($scope.meetup);
         }
         
-        MeetupService.saveNewMeetup(meetup).then(function () {
-            $scope.meetup = {};
+        MeetupService.saveNewMeetup(meetup).then(function (savedMeetup) {
+            $scope.meetup = {
+                online: false
+            };
             $scope.savingNewMeetup = false;
+            newMeetupForm.$setUntouched();
+            newMeetupForm.$setPristine();
         });
     };
 }

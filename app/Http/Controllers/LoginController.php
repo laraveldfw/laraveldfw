@@ -28,13 +28,12 @@ class LoginController extends Controller
      */
     public function attemptLogin(Requests\LoginAttemptRequest $request)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember)){
-            return response()->json([
-                'success' => true,
-                'user' => Auth::user()->toArray(),
-            ]);
-        }
-        abort(400);
+        Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember);
+        
+        return response()->json([
+            'success' => Auth::check(),
+            'user' => Auth::check() ? Auth::user()->toArray() : null,
+        ]);
     }
 
     /**
