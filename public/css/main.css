@@ -8939,6 +8939,7 @@ body {
 .feature-speaker-image {
   margin-top: 20%;
   display: inline-block;
+  max-width: 300px;
 }
 
 @media (min-width: 992px) and (max-width: 1199px) {

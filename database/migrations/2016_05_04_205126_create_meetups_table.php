@@ -15,7 +15,10 @@ class CreateMeetupsTable extends Migration
         Schema::create('meetups', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
+            $table->string('meetup_id')->unique();
             $table->timestamp('start_time');
+            $table->string('status', 20);
+            $table->string('visibility', 20);
             $table->boolean('online')->default(1);
             $table->string('location_name')->nullable();
             $table->string('location_address')->nullable();
@@ -28,6 +31,7 @@ class CreateMeetupsTable extends Migration
             $table->string('speaker_img')->nullable();
             $table->string('speaker_url')->nullable();
             $table->mediumText('additional_info')->nullable();
+            $table->integer('venue_id')->nullable();
         });
     }
 

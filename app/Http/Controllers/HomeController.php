@@ -17,11 +17,17 @@ class HomeController extends Controller
      */
     public function show()
     {
-        $meetup = Meetup::where('start_time', DB::table('meetups')->max('start_time'))->first();
+        
+        $meetup = Meetup::where('start_time',
+            DB::table('meetups')
+                ->where('status', 'upcoming')
+                ->where('visibility', 'public')
+                ->min('start_time'))
+            ->first();
 
         return view('home', [
             'data' => $meetup->toArray(),
-            'startTime' => $meetup->start_time->format('l, F jS h:iA'),
+            'startTime' => $meetup->start_time->timezone('America/Chicago')->format('l, F jS g:iA'),
         ]);
     }
 

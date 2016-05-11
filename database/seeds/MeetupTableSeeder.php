@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-
+use App\MeetupApiHelper;
 class MeetupTableSeeder extends Seeder
 {
     /**
@@ -11,6 +11,7 @@ class MeetupTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\Meetup::class, 20)->create();
+        $helper = new MeetupApiHelper();
+        $helper->checkMeetupForUpdates();
     }
 }
