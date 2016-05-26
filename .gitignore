@@ -1,6 +1,4 @@
 /bootstrap/compiled.php
-composer.phar
-composer.lock
 .env
 .DS_Store
 Thumbs.db
