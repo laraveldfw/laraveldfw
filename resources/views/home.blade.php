@@ -3,17 +3,17 @@
 @if($data['online'] !== true)
     @section('head')
         <script type="text/javascript"
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJPjuNamTjqMr47aMldOQB9ZW2yXtfr-E&sensor=false">
+                src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_API_KEY') }}&sensor=false">
         </script>
         <script type="text/javascript">
             // Enable the visual refresh
             google.maps.visualRefresh = true;
             var map;
-            var lat = {{ $data['locationlatitude'] }};
-            var lon = {{ $data['locationlongitude'] }};
+            var lat = {{ $data['location_lat'] }};
+            var lon = {{ $data['location_lng'] }};
             var laravelDFWLocation = new google.maps.LatLng(lat,lon);
 
-            lat = lat + 0.008
+            lat = lat + 0.008;
             var mapCenterLocation = new google.maps.LatLng(lat,lon);
             function initialize() {
                 var mapOptions = {
@@ -37,7 +37,7 @@
                 });
 
                 markerinfo = new google.maps.InfoWindow({
-                    content: '<a class="map-location-title-link" href="{{ $data['locationurl'] }}"><h4 class="map-location-title">{{{ $data['locationname'] }}}</h4></a><h5 class="map-date">{{{ $data['datetime'] }}}</h5><p class="map-location-address">{{{ $data['locationaddress'] }}}<br/>{{{ $data['locationphone'] }}}</p>'
+                    content: '<a class="map-location-title-link" href="{{ $data['location_url'] }}"><h4 class="map-location-title">{{{ $data['location_name'] }}}</h4></a><h5 class="map-date">{{{ $startTime }}}</h5><p class="map-location-address">{{{ $data['location_address'] }}}<br/>{{{ $data['location_phone'] }}}</p>'
                 });
                 markerinfo.open(map, marker);
 
@@ -90,6 +90,7 @@
                                     <li><a href="https://twitter.com/laracasts" target="_blank">@laracasts</a></li>
                                 </ul>
                             </li>
+                            <li><a href="/login" target="_self">Admins</a></li>
                         </ul>
                     </div>
                 </div>
@@ -105,27 +106,27 @@
                     <div class="container">
                         <div class="row feature-content">
                             <div class="col-sm-3">
-                                @if(isset($data['speakerimg']) && !empty($data['speakerimg']))
-                                    <img src="{{ asset($data['speakerimg']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
+                                @if(isset($data['speaker_img']) && !empty($data['speaker_img']))
+                                    <img src="{{ asset($data['speaker_img']) }}" alt="{{ $data['speaker'] }}" class="img-circle feature-speaker-image">
                                 @else
                                     <img src="{{ asset('images/laravel-dfw-image.jpg') }}" alt="LaravelDFW" class="img-circle feature-speaker-image">
                                 @endif
                             </div>
                             <div class="col-sm-9 feature-info">
-                                <h4>Next Meetup: <span class="meetup-date">{{ $data['datetime'] }} {{ ($data['online'])?'on':'at' }} <a href="{{ $data['locationurl'] }}" target="_blank">{{ $data['locationname'] }}</a></span></h4>
+                                <h4>Next Meetup: <span class="meetup-date">{{ $startTime }} {{ ($data['online'])?'on':'at' }} <a href="{{ $data['location_url'] }}" target="_blank">{{ $data['location_name'] }}</a></span></h4>
 
                                 <!-- Presentation Title -->
                                 <h2>{{ $data['talk'] }}</h2>
 
                                 <!-- Presented By -->
                                 @if(isset($data['speaker']) && !empty($data['speaker']))
-                                    <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speakerurl'] }}" target="_blank">{{ $data['speaker'] }}</a></h3>
+                                    <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="{{ $data['speaker_url'] }}" target="_blank">{{ $data['speaker'] }}</a></h3>
                                 @else
                                     <h3 class="presenter-text"><span class="presented-by">Presented by</span> <a href="http://www.laraveldfw.com">LaravelDFW</a></h3>
                                 @endif
                                 <!-- Free Stuff Alert -->
-                                @if(isset($data['additionalinfo']) && !empty($data['additionalinfo']))
-                                    <div class="alert alert-warning"><strong>{{ $data['additionalinfo'] }}</strong></div>
+                                @if(isset($data['additional_info']) && !empty($data['additional_info']))
+                                    <div class="alert alert-warning"><strong>{{ $data['additional_info'] }}</strong></div>
                                 @endif
 
                                 <!-- RSVP Button -->

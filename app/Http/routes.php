@@ -11,6 +11,9 @@
 |
 */
 
+Route::get('/', 'HomeController@show');
+
+/*
 Route::get('/', function () {
   $data = [
     'online' => false,
@@ -30,6 +33,7 @@ Route::get('/', function () {
 
   return view('home', compact('data'));
 });
+*/
 
 Route::get('/ask', ['as' => 'ask', function()
 {
@@ -55,3 +59,33 @@ Route::get('/tell-us-about-you', ['as' => 'tellusaboutyou', function()
 {
   return Redirect::away('https://docs.google.com/forms/d/1CVmWQdQEV91b5nPwlE4k2lmIyDKzjrhe0P0CTgjK2YA/viewform');
 }]);
+
+// Auth Stuff
+Route::get('/logout', function() 
+{
+  Auth::logout();
+  return redirect('/');
+});
+
+Route::get('/login', 'LoginController@show');
+Route::post('/loginAttempt', 'LoginController@attemptLogin');
+Route::post('/authCheck', 'LoginController@checkAuth');
+Route::post('/sendResetEmail', 'LoginController@sendResetEmail');
+
+Route::get('/getEnv', function () {
+    return response()->json([
+        'env' => env('APP_ENV'),
+    ]);
+});
+
+
+Route::group(['middleware' => ['auth']], function () {
+    
+    Route::get('/getAllUsers', 'LoginController@getAllUsers');
+    
+    Route::get('/dashboard', 'DashboardController@show');
+    Route::get('/getAllMeetups', 'DashboardController@getAllMeetups');
+    Route::post('/saveNewMeetup', 'DashboardController@saveNewMeetup');
+    
+    
+});
