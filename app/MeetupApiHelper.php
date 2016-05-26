@@ -4,7 +4,7 @@ namespace App;
 
 use Carbon\Carbon;
 use DMS\Service\Meetup\MeetupKeyAuthClient;
-use App\Meetup;
+use Log;
 
 class MeetupApiHelper {
     
@@ -138,10 +138,13 @@ class MeetupApiHelper {
                     $changed = true;
                 }
 
-                if($changed) $saved->save();
+                if($changed) {
+                    $saved->save();
+                    Log::info('Meetup info updated for id '.$saved->id);
+                }
             }
             else{
-                Meetup::create([
+                $newmeet = Meetup::create([
                     'meetup_id' => $meetup['id'],
                     'start_time' => Carbon::createFromTimestampUTC($meetup['time'] / 1000),
                     'status' => $meetup['status'],
@@ -162,6 +165,8 @@ class MeetupApiHelper {
                     'created_at' => Carbon::createFromTimestampUTC($meetup['created'] / 1000),
                     'updated_at' => Carbon::createFromTimestampUTC($meetup['updated'] / 1000),
                 ]);
+
+                Log::info('New meetup found and replicated to id '.$newmeet->id);
             }
         }
 
