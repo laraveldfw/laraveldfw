@@ -22,7 +22,7 @@ class HomeController extends Controller
             DB::table('meetups')
                 ->where('status', 'upcoming')
                 ->where('visibility', 'public')
-                ->min('start_time'))
+                ->min(DB::raw('CAST(start_time as char)')))
             ->first();
 
         return view('home', [
