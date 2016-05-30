@@ -5,6 +5,7 @@ namespace App;
 use Carbon\Carbon;
 use DMS\Service\Meetup\MeetupKeyAuthClient;
 use Log;
+use Validator;
 
 class MeetupApiHelper {
     
@@ -23,7 +24,7 @@ class MeetupApiHelper {
         elseif(!env('MEETUP_URL_NAME')){
             abort(500, "Meetup Url name not defined in env");
         }
-        $this->tags = config('meetup.meta_tags');
+        $this->tags = collect(config('meetup.meta_tags'));
         $this->meetupUrlName = env('MEETUP_URL_NAME');
         $this->apiKey = env('MEETUP_API_KEY');
         $this->client = MeetupKeyAuthClient::factory([
@@ -58,31 +59,31 @@ class MeetupApiHelper {
             $saved = Meetup::where('meetup_id', $meetup['id'])->first();
 
             // find any meta data in the description once
-            $speakerName = $this->getAttributeFromDescription('speaker_name', $meetup['description']);
-            $speakerImage = $this->getAttributeFromDescription('speaker_image', $meetup['description']);
-            $speakerUrl = $this->getAttributeFromDescription('speaker_url', $meetup['description']);
+            $metaInfo = $this->getMetaInfoFromDescription($meetup['description']);
 
             if($saved){
-                $changed = false;
+                $changed = collect([]);
                 if(!$saved->start_time->eq(Carbon::createFromTimestampUTC($meetup['time'] / 1000))){
+                    $changed->push('start time changed from '.$saved->start_time->toDateTimeString().' to '.(Carbon::createFromTimestampUTC($meetup['time'] / 1000)));
                     $saved->start_time = Carbon::createFromTimestampUTC($meetup['time'] / 1000);
-                    $changed = true;
                 }
                 if($saved->status !== $meetup['status']){
+                    $changed->push('status changed from '.$saved->status.' to '.$meetup['status']);
                     $saved->status = $meetup['status'];
-                    $changed = true;
                 }
                 if($saved->visibility !== $meetup['visibility']){
+                    $changed->push('visibility changed from '.$saved->visibility.' to '.$meetup['visibility']);
                     $saved->visibility = $meetup['visibility'];
-                    $changed = true;
                 }
-                if($saved->online !== isset($meetup['venue'])){
-                    $saved->online = isset($meetup['venue']);
-                    $changed = true;
+
+                if($saved->online === isset($meetup['venue'])){
+                    $changed->push('online status switched to '.strval($saved->online));
+                    $saved->online = !isset($meetup['venue']);
                 }
 
                 if(isset($meetup['venue'])){
                     if($meetup['venue']['id'] !== $saved->venue_id){
+                        $changed->push('venue id changed from '.$saved->venue_id.' to '.$meetup['venue']['id']);
                         $saved->location_name = $meetup['venue']['name'];
                         // for whatever reason meetup api does not always give zip info
                         $saved->location_address = $meetup['venue']['address_1']." ".$meetup['venue']['city'].", ".$meetup['venue']['state'].(isset($meetup['venue']['zip']) ? " ".$meetup['venue']['zip'] : "");
@@ -93,11 +94,12 @@ class MeetupApiHelper {
                         if(isset($meetup['venue']['phone'])){
                             $saved->location_phone = $meetup['venue']['phone'];
                         }
-                        $changed = true;
                     }
                 }
                 else{
+                    // if meetup location removed from meetup site but listed in db then remove it
                     if($saved->venue_id){
+                        $changed->push('Venue id '.$saved->venue_id.' removed from meetup');
                         $saved->location_name = null;
                         $saved->location_address = null;
                         $saved->location_phone = null;
@@ -105,42 +107,43 @@ class MeetupApiHelper {
                         $saved->location_lat = null;
                         $saved->location_lng = null;
                         $saved->venue_id = null;
-                        $changed = true;
                     }
                 }
 
                 if($saved->talk !== $meetup['name']){
+                    $changed->push('Meetup talk changed from '.$saved->talk.' to '.$meetup['name']);
                     $saved->talk = $meetup['name'];
-                    $changed = true;
                 }
                 if($saved->additional_info !== $this->cleanDescription($meetup['description'])){
+                    $changed->push('Additional info changed - ORIGINAL: '.$saved->additional_info.' NEW: '.$this->cleanDescription($meetup['description']));
                     $saved->additional_info  = $this->cleanDescription($meetup['description']);
-                    $changed = true;
-                }
-                if($saved->speaker !== $speakerName){
-                    $saved->speaker = $speakerName;
-                    $changed = true;
-                }
-                if($saved->speaker_img !== $speakerImage){
-                    $saved->speaker_img = $speakerImage;
-                    $changed = true;
-                }
-                if($saved->speaker_url !== $speakerUrl){
-                    $saved->speaker_url = $speakerUrl;
-                    $changed = true;
-                }
-                if(!$saved->created_at->eq(Carbon::createFromTimestampUTC($meetup['created'] / 1000))){
-                    $saved->created_at = Carbon::createFromTimestampUTC($meetup['created'] / 1000);
-                    $changed = true;
-                }
-                if(!$saved->updated_at->eq(Carbon::createFromTimestampUTC($meetup['updated'] / 1000))){
-                    $saved->updated_at = Carbon::createFromTimestampUTC($meetup['updated'] / 1000);
-                    $changed = true;
                 }
 
-                if($changed) {
+                if($saved->speaker !== $metaInfo->get('speaker')){
+                    $changed->push('Speaker name changed from '.$saved->speaker.' to '.$metaInfo->get('speaker'));
+                    $saved->speaker = $metaInfo->get('speaker');
+                }
+                if($saved->speaker_img !== $metaInfo->get('speaker_img')){
+                    $changed->push('Speaker imaged changed from '.$saved->speaker_img.' to '.$metaInfo->get('speaker_img'));
+                    $saved->speaker_img = $metaInfo->get('speaker_img');
+                }
+                if($saved->speaker_url !== $metaInfo->get('speaker_url')){
+                    $changed->push('Speaker url changed from '.$saved->speaker_url.' to '.$metaInfo->get('speaker_url'));
+                    $saved->speaker_url = $metaInfo->get('speaker_url');
+                }
+
+                if(!$saved->created_at->eq(Carbon::createFromTimestampUTC($meetup['created'] / 1000))){
+                    $changed->push('Meetup creation date changed from '.$saved->created_at->toDateTimeString().' to '.Carbon::createFromTimestampUTC($meetup['created'] / 1000)->toDateTimeString());
+                    $saved->created_at = Carbon::createFromTimestampUTC($meetup['created'] / 1000);
+                }
+                if(!$saved->updated_at->eq(Carbon::createFromTimestampUTC($meetup['updated'] / 1000))){
+                    $changed->push('Meetup updated date changed from '.$saved->updated_at->toDateTimeString().' to '.Carbon::createFromTimestampUTC($meetup['updated'] / 1000)->toDateTimeString());
+                    $saved->updated_at = Carbon::createFromTimestampUTC($meetup['updated'] / 1000);
+                }
+
+                if(!$changed->isEmpty()) {
                     $saved->save();
-                    Log::info('Meetup info updated for id '.$saved->id);
+                    Log::info('Meetup info updated for id '.$saved->id, $changed->merge($meetups->toArray())->toArray());
                 }
             }
             else{
@@ -159,9 +162,9 @@ class MeetupApiHelper {
                     'talk' => $meetup['name'],
                     'additional_info' => $this->cleanDescription($meetup['description']),
                     'venue_id' => isset($meetup['venue']) ? $meetup['venue']['id'] : null,
-                    'speaker' => $speakerName,
-                    'speaker_img' => $speakerImage,
-                    'speaker_url' => $speakerUrl,
+                    'speaker' => $metaInfo->get('speaker'),
+                    'speaker_img' => $metaInfo->get('speaker_img'),
+                    'speaker_url' => $metaInfo->get('speaker_url'),
                     'created_at' => Carbon::createFromTimestampUTC($meetup['created'] / 1000),
                     'updated_at' => Carbon::createFromTimestampUTC($meetup['updated'] / 1000),
                 ]);
@@ -177,51 +180,50 @@ class MeetupApiHelper {
         $meetupIds->each(function ($id) use ($apiIds) {
             if(!in_array($id, $apiIds)){
                 Meetup::where('meetup_id', $id)->delete();
+                Log::info('Meetup id '.$id.' removed from db');
             }
         });
 
+        $this->meetups = $meetups;
         return $meetups;
     }
-
+    
     /**
-     * Gets additional info about the meeting from the description body (which is html)
-     * TODO redo and incorporate the meetup config file -> meta_tags info
-     * Current 'tags' that can be used (put them each on their own line at the bottom of the description on meetup.com)
-     * @speakername Joe Smith
-     * @speakerimage https://www.speaker.com/4.jpg **urls MUST start with 'http' or 'https'
-     * @speakercontact https://www.speakersblog.com
-     *
-     * @params attribute (string|required), description (string|required)
-     * @return attribute (string), or null if not present
-     */
-    private function getAttributeFromDescription ($attribute, $description)
+    * Gets the meta content from the description using meta tag info in config/meetup
+    *
+    * @params description (string|required)
+    * @return Collection (keyed by table column name)
+    */
+    private function getMetaInfoFromDescription ($description) 
     {
-        if(!$description) return null;
-        switch($attribute){
-            case 'speaker_name':
-                $tag = '@speakername';
-                $cut = substr($description, stripos($description, $tag));
-                $name = substr($cut, strpos($cut, ' ') + 1, strpos($cut, '</p>') - strpos($cut, ' ') - 1);
-                return $name;
-            case 'speaker_image':
-                $tag = '@speakerimage';
-                $cut = substr($description, stripos($description, $tag));
-                $cut2 = substr($cut, strpos($cut, 'http'));
-                $urlend = strpos($cut2, '"') > strpos($cut2, ' ') ? strpos($cut2, ' ') : strpos($cut2, '"');
-                $imageurl = substr($cut2, 0, $urlend);
+        $metaInfo = collect([]);
+        if(!$description) return $metaInfo;
 
-                return filter_var($imageurl, FILTER_VALIDATE_URL) ? $imageurl : null;
-            case 'speaker_url':
-                $tag = '@speakercontact';
-                $cut = substr($description, stripos($description, $tag));
-                $cut2 = substr($cut, strpos($cut, 'http'));
-                $urlend = strpos($cut2, '"') > strpos($cut2, ' ') ? strpos($cut2, ' ') : strpos($cut2, '"');
-                $contacturl = substr($cut2, 0, $urlend);
+        $this->tags->each(function ($tag) use ($description, $metaInfo) {
 
-                return filter_var($contacturl, FILTER_VALIDATE_URL) ? $contacturl : null;
-            default:
-                return null;
-        }
+            $tagpos = stripos($description, $tag['tag']);
+            if($tagpos !== false) {
+                if(stripos($tag['validate'], 'url') !== false){
+                    $cut = substr($description, $tagpos);
+                    $cut2 = substr($cut, strpos($cut, 'http'));
+                    $urlend = strpos($cut2, '"') > strpos($cut2, ' ') ? strpos($cut2, ' ') : strpos($cut2, '"');
+                    $value = substr($cut2, 0, $urlend);
+                }
+                else {
+                    // just grabbing whatever string is after the tag until another tag or EOL
+                    $cut = substr($description, $tagpos);
+                    $value = substr($cut, strpos($cut, ' ') + 1, strpos($cut, '</p>') - strpos($cut, ' ') - 1);
+                }
+
+                $validator = Validator::make(['value' => $value], ['value' => $tag['validate']]);
+
+                if($validator->passes()){
+                    $metaInfo->put($tag['column'], $value);
+                }
+            }
+        });
+
+        return $metaInfo;
     }
 
     /**
