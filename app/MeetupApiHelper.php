@@ -184,6 +184,7 @@ class MeetupApiHelper {
             }
         });
 
+        Log::info('Meetup api check completed on '.Carbon::now()->toDateTimeString());
         $this->meetups = $meetups;
         return $meetups;
     }
