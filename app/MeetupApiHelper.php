@@ -212,7 +212,7 @@ class MeetupApiHelper {
                 else {
                     // just grabbing whatever string is after the tag until another tag or EOL
                     $cut = substr($description, $tagpos);
-                    $value = substr($cut, strpos($cut, ' ') + 1, strpos($cut, '</p>') - strpos($cut, ' ') - 1);
+                    $value = substr($cut, strpos($cut, ' ') + 1, strpos($cut, '</p>') - strpos($cut, ' ') + 1);
                 }
 
                 $validator = Validator::make(['value' => $value], ['value' => $tag['validate']]);
