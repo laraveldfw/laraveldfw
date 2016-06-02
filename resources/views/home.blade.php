@@ -126,7 +126,7 @@
                                 @endif
                                 <!-- Free Stuff Alert -->
                                 @if(isset($data['additional_info']) && !empty($data['additional_info']))
-                                    <div class="alert alert-warning"><strong>{{ $data['additional_info'] }}</strong></div>
+                                    <div class="alert alert-warning"><strong id="additionalInfo">{{ $data['additional_info'] }}</strong></div>
                                 @endif
 
                                 <!-- RSVP Button -->
@@ -227,6 +227,15 @@
             return false;
         });
 
+        $(document).ready(function () {
+            var maxInfo = 150;
+            var info = $("#additionalInfo").html();
+
+            if(info.length > maxInfo){
+                var newInfo = info.substr(0, maxInfo) + '... ' + '<a href="{{ route('rsvp') }}" target="_blank">See More</a>';
+                $("#additionalInfo").html(newInfo);
+            }
+        });
     </script>
 
 @stop
