@@ -18,11 +18,9 @@ class HomeController extends Controller
     public function show()
     {
         
-        $meetup = Meetup::where('start_time',
-            DB::table('meetups')
-                ->where('status', 'upcoming')
-                ->where('visibility', 'public')
-                ->min(DB::raw('CAST(start_time as char)')))
+        $meetup = Meetup::where('status', 'upcoming')
+            ->where('visibility', 'public')
+            ->orderBy('start_time', 'asc')
             ->first();
 
         return view('home', [
