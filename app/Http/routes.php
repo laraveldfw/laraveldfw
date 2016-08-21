@@ -98,10 +98,10 @@ Route::group(['middleware' => ['auth']], function () {
 
 // Letsencrypt validation
 Route::get('/.well-known/acme-challenge/{pathId}', function ($pathId) {
-    if (strpos($pathId, env('ROUTE_VALIDATE_1')) !== false) {
+    if (strpos(env('ROUTE_VALIDATE_1'), $pathId) !== false) {
         return env('ROUTE_VALIDATE_1');
     }
-    elseif (strpos($pathId, env('ROUTE_VALIDATE_2')) !== false) {
+    elseif (strpos(env('ROUTE_VALIDATE_2'), $pathId) !== false) {
         return env('ROUTE_VALIDATE_2');
     }
     abort(404);
