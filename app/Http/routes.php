@@ -97,10 +97,10 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 // Letsencrypt validation
-Route::get('/.well-known/acme-challenge/zMxPLDkUPciZE5_179GgGHwngz2akO2Ezcc1kaUzwQo', function () {
+Route::get('/.well-known/acme-challenge/'.(env('VALIDATE_PATH_1')), function () {
     return env('ROUTE_VALIDATE_1');
 });
 
-Route::get('/.well-known/acme-challenge/JTInKeNjuNI8KKP2Hb8LWZ7AgkA5CbZGPUCfzXJdQZE', function () {
+Route::get('/.well-known/acme-challenge/'.(env('VALIDATE_PATH_2')), function () {
     return env('ROUTE_VALIDATE_2');
 });
