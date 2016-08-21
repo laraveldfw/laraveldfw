@@ -95,3 +95,12 @@ Route::group(['middleware' => ['auth']], function () {
     
     
 });
+
+// Letsencrypt validation
+Route::get('/.well-known/acme-challenge/zMxPLDkUPciZE5_179GgGHwngz2akO2Ezcc1kaUzwQo', function () {
+    return "zMxPLDkUPciZE5_179GgGHwngz2akO2Ezcc1kaUzwQo.hSIaQp9ewJB-dUD3bSmxxIvFSBqeC_TRMBwj2i5orfM";
+});
+
+Route::get('/.well-known/acme-challenge/JTInKeNjuNI8KKP2Hb8LWZ7AgkA5CbZGPUCfzXJdQZE', function () {
+    return "JTInKeNjuNI8KKP2Hb8LWZ7AgkA5CbZGPUCfzXJdQZE.hSIaQp9ewJB-dUD3bSmxxIvFSBqeC_TRMBwj2i5orfM";
+});
