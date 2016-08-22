@@ -2,12 +2,12 @@
 
 /*
 |--------------------------------------------------------------------------
-| Application Routes
+| Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
+| This file is where you may define all of the routes that are handled
+| by your application. Just tell Laravel the URIs it should respond
+| to using a Closure or controller method. Build something great!
 |
 */
 
@@ -37,12 +37,12 @@ Route::get('/', function () {
 
 Route::get('/ask', ['as' => 'ask', function()
 {
-  return Redirect::away('https://www.twitter.com/laraveldfw');
+    return Redirect::away('https://www.twitter.com/laraveldfw');
 }]);
 
 Route::get('/live', array('as' => 'live', function()
 {
-  return Redirect::away('http://www.youtube.com/watch?v=yQiqYWIFE-w');
+    return Redirect::away('http://www.youtube.com/watch?v=yQiqYWIFE-w');
 }));
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
@@ -53,7 +53,7 @@ Route::get('/rsvp', array('as' => 'rsvp', function()
         ->orderBy('start_time', 'asc')
         ->select('meetup_id')
         ->first();
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/'.$meetup->meetup_id.'/');
+    return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/'.$meetup->meetup_id.'/');
 }));
 
 Route::get('/slack', array('as' => 'slack', function()
@@ -63,14 +63,14 @@ Route::get('/slack', array('as' => 'slack', function()
 
 Route::get('/tell-us-about-you', ['as' => 'tellusaboutyou', function()
 {
-  return Redirect::away('https://docs.google.com/forms/d/1CVmWQdQEV91b5nPwlE4k2lmIyDKzjrhe0P0CTgjK2YA/viewform');
+    return Redirect::away('https://docs.google.com/forms/d/1CVmWQdQEV91b5nPwlE4k2lmIyDKzjrhe0P0CTgjK2YA/viewform');
 }]);
 
 // Auth Stuff
-Route::get('/logout', function() 
+Route::get('/logout', function()
 {
-  Auth::logout();
-  return redirect('/');
+    Auth::logout();
+    return redirect('/');
 });
 
 Route::get('/login', 'LoginController@show');
@@ -86,24 +86,12 @@ Route::get('/getEnv', function () {
 
 
 Route::group(['middleware' => ['auth']], function () {
-    
+
     Route::get('/getAllUsers', 'LoginController@getAllUsers');
-    
+
     Route::get('/dashboard', 'DashboardController@show');
     Route::get('/getAllMeetups', 'DashboardController@getAllMeetups');
     Route::post('/saveNewMeetup', 'DashboardController@saveNewMeetup');
-    
-    
-});
 
-// Letsencrypt validation
-Route::get('/.well-known/acme-challenge/{pathId}', function ($pathId) {
-    if (strpos(env('ROUTE_VALIDATE_1'), $pathId) !== false) {
-        return env('ROUTE_VALIDATE_1');
-    }
-    elseif (strpos(env('ROUTE_VALIDATE_2'), $pathId) !== false) {
-        return env('ROUTE_VALIDATE_2');
-    }
-    abort(404);
-});
 
+});
