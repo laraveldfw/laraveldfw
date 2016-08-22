@@ -16,7 +16,7 @@ class CreateMeetupsTable extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->string('meetup_id')->unique();
-            $table->timestamp('start_time');
+            $table->timestamp('start_time')->nullable();
             $table->string('status', 20);
             $table->string('visibility', 20);
             $table->boolean('online')->default(1);
