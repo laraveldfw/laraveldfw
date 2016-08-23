@@ -165,7 +165,7 @@
     <div class="container">
         <!-- Begin MailChimp Signup Form -->
         <div id="mc_embed_signup">
-            <form action="http://laraveldfw.us7.list-manage.com/subscribe/post?u=fddcabd02e9fef6de60bf4e2b&amp;id=0bf5df0e38" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+            <form action="https://laraveldfw.us7.list-manage.com/subscribe/post?u=fddcabd02e9fef6de60bf4e2b&amp;id=0bf5df0e38" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
                 <div class="row">
 
                     <div class="col-sm-4 col-sm-offset-4">
