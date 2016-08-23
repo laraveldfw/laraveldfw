@@ -8,7 +8,7 @@
     <meta name="google-site-verification" content="Oya4QNGKhL5X4zUOMDE1eFxAzosmSZS8dSq8L76kLVo" />
 
     {{-- Fonts and CSS --}}
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600,700' rel='stylesheet' type='text/css'>
     <link type="text/css" rel="stylesheet" href="css/main.css">
 
     {{-- Font Awesome --}}
