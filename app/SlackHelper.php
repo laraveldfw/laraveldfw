@@ -89,12 +89,12 @@ class SlackHelper {
      *
      * @returns bool
      */
-    public function emailAndNameAreUniqueToTeam($email, $name)
+    public function emailIsUniqueToTeam($email)
     {
         $users = $this->getAllUsers();
-        return $users->contains(function ($user) use ($email, $name) {
-            return ($user['name'] !== $name && $user['profile']['email'] !== $email);
-        });
+        return !($users->contains(function ($user) use ($email) {
+            return $user->profile->email !== $email;
+        }));
     }
 
     public function getPendingUserFromToken($token)

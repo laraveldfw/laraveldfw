@@ -62,10 +62,8 @@ class SlackController extends Controller
     //TODO remove when done testing
     public function test()
     {
-        dd($this->slackHelper->sendConfirmationToSlack(collect([
-            'name' => 'Joe Test',
-            'email' => 'test@test.com',
-            'created_at' => Carbon::now()
-        ])));
+
+        dd($this->slackHelper->emailIsUniqueToTeam('different@email.com'));
+        //dd($this->slackHelper->slackApiCall('users.list'));
     }
 }

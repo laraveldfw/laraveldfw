@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Guzzle\Http\Message\Response;
 use Illuminate\Foundation\Http\FormRequest;
 use App\SlackHelper;
-use Input;
+
 class SlackInviteRequest extends FormRequest
 {
     /**
@@ -16,7 +16,7 @@ class SlackInviteRequest extends FormRequest
     public function authorize()
     {
         $helper = new SlackHelper();
-        if ($helper->emailAndNameAreUniqueToTeam(Input::get('email'), Input::get('name'))) {
+        if ($helper->emailIsUniqueToTeam($this->request->get('email'))) {
             return true;
         }
         return false;

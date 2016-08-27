@@ -276,11 +276,11 @@
             }
 
 
-            $("#slackName").keydown(function () {
+            $("#slackName").keyup(function () {
                slackName = $("#slackName").val();
                 formValidCheck(true);
             });
-            $("#slackEmail").keydown(function () {
+            $("#slackEmail").keyup(function () {
                 slackEmail = $("#slackEmail").val();
                 formValidCheck(true);
             });
@@ -313,7 +313,7 @@
                                 $("#slackEmail").prop('disabled', false);
                                 $("#slackName").prop('disabled', false);
                                 $("#slackFeedbackGroup").addClass('has-error');
-                                $("#slackInviteFeedback").html('That email/name combination already exists in our group');
+                                $("#slackInviteFeedback").html('That email already exists in our group');
                                 $("#slackEmailGroup").addClass('has-error');
                                 $("#slackInviteBtn").prop('disabled', false);
                             }
