@@ -6,6 +6,7 @@ use Maknz;
 use Log;
 use DB;
 use Carbon\Carbon;
+use Mail;
 class SlackHelper {
 
     private $client;
@@ -58,8 +59,7 @@ class SlackHelper {
     /*
      * Sends a confirmation link to admins via email
      *
-     * @param string email
-     * @param string name
+     * @param collection $pending
      *
      * @returns bool
      */
@@ -97,6 +97,19 @@ class SlackHelper {
         });
     }
 
+    public function getPendingUserFromToken($token)
+    {
+        if(gettype($token) !== 'string' || strlen($token) !== 32){
+            return null;
+        }
+        return DB::table('slack_pending_invites')->where('token', $token)->first();
+    }
+
+    public function deletePendingInvite($id)
+    {
+        return DB::table('slack_pending_invites')->where('id', $id)->delete();
+    }
+
     private function getAllUsers()
     {
         $response = $this->slackApiCall('users.list');
@@ -128,17 +141,26 @@ class SlackHelper {
 
     public function addPendingInvite($email, $name)
     {
+        $existing = DB::table('slack_pending_invites')->where('email', $email)->get();
+        if ($existing) {
+            DB::table('slack_pending_invites')->where('email', $email)->delete();
+        }
         $now = Carbon::now();
         $token = str_random(32);
-        DB::insert('insert into slack_pending_invites (created_at, updated_at, slack_name, email, token) values (?,?,?,?,?)', [
-            $now->toDateTimeString(), $now->toDateTimeString(), $name, $email, $token
+        $id = DB::table('slack_pending_invites')->insertGetId([
+            'created_at' => $now->toDateTimeString(),
+            'updated_at' => $now->toDateTimeString(),
+            'slack_name' => $name,
+            'email' => $email,
+            'token' => $token,
         ]);
 
         return collect([
             'name' => $name,
             'email' => $email,
             'token' => $token,
-            'created_at' => $now
+            'created_at' => $now,
+            'id' => $id
         ]);
     }
 }

@@ -9,7 +9,8 @@
         "laravel/framework": "5.3.*",
         "dms/meetup-api-client": "^2.2",
         "coderstephen/slack-client": "^0.2.4",
-        "maknz/slack": "^1.7"
+        "maknz/slack": "^1.7",
+        "barryvdh/laravel-ide-helper": "^2.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

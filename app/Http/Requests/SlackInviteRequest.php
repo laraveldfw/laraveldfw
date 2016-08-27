@@ -15,7 +15,8 @@ class SlackInviteRequest extends FormRequest
      */
     public function authorize()
     {
-        if (SlackHelper::emailAndNameAreUniqueToTeam(Input::get('email'), Input::get('name'))) {
+        $helper = new SlackHelper();
+        if ($helper->emailAndNameAreUniqueToTeam(Input::get('email'), Input::get('name'))) {
             return true;
         }
         return false;
@@ -24,7 +25,7 @@ class SlackInviteRequest extends FormRequest
     public function forbiddenResponse()
     {
         return response()->json([
-            'emailExists' => true,
+            'userExists' => true,
         ]);
     }
 

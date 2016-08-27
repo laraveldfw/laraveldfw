@@ -13,7 +13,7 @@ class CreateSlackPendingInvitesTable extends Migration
      */
     public function up()
     {
-        Schema::table('slack_pending_invites', function (Blueprint $table) {
+        Schema::create('slack_pending_invites', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
             $table->string('slack_name', 50);
@@ -29,6 +29,6 @@ class CreateSlackPendingInvitesTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('slack_pending_invites');
     }
 }

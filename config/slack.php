@@ -18,6 +18,8 @@ return [
 
         // in minutes, put false for no expiration
         'invite_expire_minutes' => false,
+
+        'delete_expired_confirmations' => false,
     ]
 
 ];

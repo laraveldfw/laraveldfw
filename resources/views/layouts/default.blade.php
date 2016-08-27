@@ -23,7 +23,21 @@
 <body>
 
 @yield('content')
-
+@if(env('APP_DEBUG'))
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="serverErrorModalTitle" id="serverErrorModal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="serverErrorModalTitle">Server Error</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="serverErrorContent"></div>
+            </div>
+        </div>
+    </div>
+    @endif
 {{-- Remote jQuery with local fallback --}}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
