@@ -95,3 +95,10 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 });
+
+
+Route::post('/requestSlackInvite', 'SlackController@requestInvite');
+Route::get('/confirmSlackInvite/{token}', 'SlackController@confirmInvite');
+
+//TODO remove when done testing
+Route::get('/slackTest', 'SlackController@test');
