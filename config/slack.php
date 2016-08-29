@@ -6,12 +6,12 @@ return [
 
     'invite_request' => [
 
-        // whether or not to just automatically email the invite to the requester
-        // all other options will be ignored
-        'auto_invite' => false,
-
-        // manual confirm either 'slack' or 'email'
+        // manual confirm either 'slack' or 'email' or 'all'
+        // set to false to bypass manual confirmation
         'manual_confirm_via' => 'slack',
+
+        // channel to send manual slack confirmations to
+        'slack_confirm_channel' => 'organizers',
 
         // email if manually confirming via email
         'manual_confirm_email' => env('SLACK_INVITE_EMAIL', 'support@laraveldfw.com'),

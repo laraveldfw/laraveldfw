@@ -37,7 +37,7 @@ class SlackInviteRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email',
+            'email' => 'required|email|unique:slack_invites,email',
             'name' => 'required|string|max:50',
         ];
     }

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0d4aed623f72c314fc58b890e0e1f834",
-    "content-hash": "b291be6d091b54f21b1ddb5e0e5ce3fe",
+    "hash": "1678b5c060a1b01f2e3e514c39905170",
+    "content-hash": "601b9dd2933b17d980d32563a1803e2e",
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -253,6 +253,59 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "time": "2014-12-30 15:22:37"
+        },
+        {
+            "name": "darovi/laravelslackinvite",
+            "version": "v1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Darovi/LaravelSlackInvite.git",
+                "reference": "e24404c6320e95b584c32e8c62192d83f3800eb7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Darovi/LaravelSlackInvite/zipball/e24404c6320e95b584c32e8c62192d83f3800eb7",
+                "reference": "e24404c6320e95b584c32e8c62192d83f3800eb7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "laravel/framework": "5.3.*",
+                "phpunit/phpunit": "4.8.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Darovi\\LaravelSlackInvite\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dan Rovito",
+                    "email": "dan@darovi.co"
+                }
+            ],
+            "description": "A Slack user invite service provider for Laravel",
+            "keywords": [
+                "Invite",
+                "laravel",
+                "slack"
+            ],
+            "time": "2016-08-26 15:35:14"
         },
         {
             "name": "devristo/phpws",

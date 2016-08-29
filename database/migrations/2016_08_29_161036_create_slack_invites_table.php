@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSlackPendingInvitesTable extends Migration
+class CreateSlackInvitesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateSlackPendingInvitesTable extends Migration
      */
     public function up()
     {
-        Schema::create('slack_pending_invites', function (Blueprint $table) {
+        Schema::create('slack_invites', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
-            $table->string('slack_name', 50);
+            $table->string('name')->nullable();
             $table->string('email');
-            $table->string('token', 32);
+            $table->string('token', 32)->unique();
+            $table->timestamp('confirmed_at')->nullable();
         });
     }
 
@@ -29,6 +30,6 @@ class CreateSlackPendingInvitesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('slack_pending_invites');
+        Schema::drop('slack_invites');
     }
 }

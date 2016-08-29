@@ -2,33 +2,31 @@
 
 namespace App;
 
-use Maknz;
 use Log;
 use DB;
 use Carbon\Carbon;
-use Mail;
-class SlackHelper {
+use App\SlackInvite;
 
-    private $client;
+class SlackHelper {
 
     public function __construct()
     {
-        $this->client = new Maknz\Slack\Client(env('SLACK_WEBHOOK'));
+
     }
 
     /*
      * Sends a confirmation link to admins via slack
      *
-     * @param collection pending
+     * @param SlackInvite $invited
      *
      * @returns response
      */
-    public function sendConfirmationToSlack($pending)
+    public function sendConfirmationToSlack(SlackInvite $invited)
     {
         return $this->slackApiCall('chat.postMessage', [
-            'channel' => '#organizers',
+            'channel' => '#'.config('slack.invite_request.slack_confirm_channel'),
             'text' => 'From laraveldfw.com',
-            'attachments' => json_encode([
+            'attachments' => [
                 [
                     'fallback' => 'New Slack Invite Request',
                     'color' => '#36a64f',
@@ -36,53 +34,33 @@ class SlackHelper {
                     'fields' => [
                         [
                             'title' => 'Name',
-                            'value' => $pending->get('name'),
+                            'value' => $invited->name,
                             'short' => true,
                         ],
                         [
                             'title' => 'Email',
-                            'value' => $pending->get('email'),
+                            'value' => $invited->email,
                             'short' => true,
                         ],
                         [
                             'title' => 'Click the link below to confirm',
-                            'value' => 'https://laraveldfw.com/confirmSlackInvite/'.$pending->get('token'),
+                            'value' => $invited->generateConfirmationURL(),
                             'short' => false,
                         ]
                     ],
-                    'ts' => $pending->get('created_at')->timestamp
-                ]
-            ])
+                    'ts' => $invited->created_at->timestamp
+                ],
+            ],
         ]);
     }
 
     /*
-     * Sends a confirmation link to admins via email
-     *
-     * @param collection $pending
-     *
-     * @returns bool
+     * Notifies that the slack invite was sent and confirmed
      */
-    public function sendConfirmationToEmail($pending)
-    {
 
-    }
 
     /*
-     * Automatically invite the person
-     *
-     * @param string email
-     * @param string name
-     *
-     * @returns bool
-     */
-    public function inviteUserToTeam($email, $name)
-    {
-
-    }
-
-    /*
-     * Checks to make sure the name and email are unique
+     * Checks to make sure email is unique to the team
      *
      * @param string email
      * @param string name
@@ -97,19 +75,6 @@ class SlackHelper {
         }));
     }
 
-    public function getPendingUserFromToken($token)
-    {
-        if(gettype($token) !== 'string' || strlen($token) !== 32){
-            return null;
-        }
-        return DB::table('slack_pending_invites')->where('token', $token)->first();
-    }
-
-    public function deletePendingInvite($id)
-    {
-        return DB::table('slack_pending_invites')->where('id', $id)->delete();
-    }
-
     private function getAllUsers()
     {
         $response = $this->slackApiCall('users.list');
@@ -118,8 +83,13 @@ class SlackHelper {
 
     public function slackApiCall($command, $arguments = null)
     {
-        $url = 'https://slack.com/api/'.$command.'?token='.env('SLACK_API_TOKEN');
-        if ($arguments) {
+        $url = 'https://slack.com/api/'.$command.'?token='.env('SLACK_TOKEN');
+        if (gettype($arguments) === 'array' && count($arguments) > 0) {
+            foreach ($arguments as $key => &$value) {
+                if (gettype($value) === 'array') {
+                    $value = json_encode($value);
+                }
+            }
             $url .= '&'.http_build_query($arguments);
         }
         $ch = curl_init();
@@ -137,30 +107,5 @@ class SlackHelper {
             //abort(400);
             dd($response, $url, $arguments);
         }
-    }
-
-    public function addPendingInvite($email, $name)
-    {
-        $existing = DB::table('slack_pending_invites')->where('email', $email)->get();
-        if ($existing) {
-            DB::table('slack_pending_invites')->where('email', $email)->delete();
-        }
-        $now = Carbon::now();
-        $token = str_random(32);
-        $id = DB::table('slack_pending_invites')->insertGetId([
-            'created_at' => $now->toDateTimeString(),
-            'updated_at' => $now->toDateTimeString(),
-            'slack_name' => $name,
-            'email' => $email,
-            'token' => $token,
-        ]);
-
-        return collect([
-            'name' => $name,
-            'email' => $email,
-            'token' => $token,
-            'created_at' => $now,
-            'id' => $id
-        ]);
     }
 }

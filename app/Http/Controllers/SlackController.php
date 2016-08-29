@@ -8,6 +8,9 @@ use App\Http\Requests;
 use App\SlackHelper;
 use Carbon\Carbon;
 use DB;
+use App\SlackInvite;
+use App\Events\SlackInviteConfirmed;
+use App\Events\SlackInviteRequested;
 class SlackController extends Controller
 {
 
@@ -20,18 +23,19 @@ class SlackController extends Controller
 
     public function requestInvite(Requests\SlackInviteRequest $request)
     {
-        if (config('slack.invite_request.auto_invite')) {
-            $this->slackHelper->inviteUserToTeam($request->email, $request->name);
+        $invited = SlackInvite::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'token' => str_random(32),
+        ]);
+        if (config('slack.invite_request.manual_confirm_via') === false) {
+            $response = $invited->inviteToTeam();
+            if ($response['ok']) {
+                $invited->delete();
+            }
         }
         else {
-            $pendingUser = $this->slackHelper->addPendingInvite($request->email, $request->name);
-            $confirmVia = config('slack.invite_request.manual_confirm_via');
-            if ($confirmVia === 'slack' || $confirmVia === 'all') {
-                $this->slackHelper->sendConfirmationToSlack($pendingUser);
-            }
-            if ($confirmVia === 'email' || $confirmVia === 'all') {
-                $this->slackHelper->sendConfirmationToEmail($pendingUser);
-            }
+            event(new SlackInviteRequested($invited));
         }
 
         return response()->json([
@@ -41,22 +45,17 @@ class SlackController extends Controller
 
     public function confirmInvite($token)
     {
-        $pending = $this->slackHelper->getPendingUserFromToken($token);
-        if (!$pending) {
-            abort(400, 'Confirmation does not exist');
+        $invited = SlackInvite::where('token', $token)->first();
+        if ($invited) {
+            $invited->confirmed_at = Carbon::now();
+            $invited->save();
+            event(new SlackInviteConfirmed($invited));
+            return view('inviteConfirmed', ['name' => $invited->name, 'email' => $invited->email]);
         }
-        $expire = config('slack.invite_request.invite_expire_minutes');
-        if ($expire) {
-            $expireTime = Carbon::parse($pending->created_at)->addMinutes($expire);
-            if (Carbon::now()->gt($expireTime)) {
-                if (config('slack.invite_request.delete_expired_confirmations')) {
-                    $this->slackHelper->deletePendingInvite($pending->id);
-                }
-                abort(410, 'The confirmation has expired');
-            }
+        else {
+            abort(400, 'Invite Not Found');
         }
-        $this->slackHelper->inviteUserToTeam($pending->email, $pending->name);
-        return view('inviteConfirmed', ['name' => $pending->name, 'email' => $pending->email]);
+
     }
 
     //TODO remove when done testing
