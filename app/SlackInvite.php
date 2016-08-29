@@ -29,6 +29,9 @@ class SlackInvite extends Model
      */
     public function generateConfirmationURL()
     {
+        if (env('APP_ENV') === 'local') {
+            return 'http://laraveldfw.app/confirmSlackInvite/'.$this->token;
+        }
         return 'https://laraveldfw.com/confirmSlackInvite/'.$this->token;
     }
 }

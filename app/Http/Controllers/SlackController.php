@@ -73,8 +73,8 @@ class SlackController extends Controller
     //TODO remove when done testing
     public function test()
     {
-
-        dd($this->slackHelper->emailIsUniqueToTeam('different@email.com'));
+        $helper = new SlackHelper();
+        dd($helper->emailIsUniqueToTeam('joe@test.com'));
         //dd($this->slackHelper->slackApiCall('users.list'));
     }
 }

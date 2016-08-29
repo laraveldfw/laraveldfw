@@ -42,7 +42,7 @@ class Kernel extends ConsoleKernel
                 return false;
             }
             $cutoff = Carbon::now()->subMinutes($deleteMin);
-            $deletes = SlackInvite::where('created_at', '>', $cutoff)->delete();
+            $deletes = SlackInvite::where('created_at', '<', $cutoff)->delete();
             if ($deletes) {
                 Log::info('Removed '.$deletes.' rows from slack_invites table');
             }

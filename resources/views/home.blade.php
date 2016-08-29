@@ -238,6 +238,7 @@
                         <div class="form-group" id="slackFeedbackGroup">
                             <h4 id="slackInviteFeedback"></h4>
                         </div>
+                        <div id="captcha"></div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -250,9 +251,10 @@
 @stop
 
 @section('footer')
-
+    <script src='https://www.google.com/recaptcha/api.js'></script>
     <script type="text/javascript">
         var token = '{{ csrf_token() }}';
+
         $("body").backstretch("images/laravel-dfw-bg.jpg");
 
         $('.back-to-top').click(function(){
@@ -270,10 +272,36 @@
             var info = $("#additionalInfo").html();
             var slackEmail = '';
             var slackName = '';
+            var captchaRendered = false;
+            var captchaActive = true;
+            var captcha = null;
+
             if(info.length > maxInfo){
                 var newInfo = info.substr(0, maxInfo) + '... ' + '<a href="{{ route('rsvp') }}" target="_blank">See More</a>';
                 $("#additionalInfo").html(newInfo);
             }
+
+            function captchaClicked () {
+                captcha = grecaptcha.getResponse();
+                formValidCheck(true);
+            }
+
+            function captchaExpired () {
+                captchaActive = false;
+                formValidCheck(true);
+                $("#slackInviteFeedback").html('The captcha has expired. Please refresh the page.');
+            }
+
+            $("#slackInviteModal").on('shown.bs.modal', function (e) {
+                if (!captchaRendered) {
+                    grecaptcha.render($("#captcha")[0], {
+                        sitekey: '{{ env('RECAPTCHA_SITE_KEY') }}',
+                        callback: captchaClicked,
+                        "expired-callback": captchaExpired
+                    });
+                    captchaRendered = true;
+                }
+            });
 
 
             $("#slackName").keyup(function () {
@@ -287,7 +315,8 @@
 
             function formValidCheck (affectBtn) {
                  var valid = (typeof slackName === 'string' && slackName.length <= 50 && slackName.length > 1) &&
-                         (typeof slackEmail === 'string' && slackEmail.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/));
+                         (typeof slackEmail === 'string' && slackEmail.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/) &&
+                         captcha && captchaActive);
                 if (affectBtn) {
                     $("#slackInviteBtn").prop('disabled', !valid);
                 }
@@ -306,7 +335,8 @@
                         data: {
                             name: slackName,
                             email: slackEmail,
-                            _token: token
+                            _token: token,
+                            captcha: captcha
                         },
                         success: function (response) {
                             if (response.userExists) {

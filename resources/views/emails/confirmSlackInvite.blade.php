@@ -7,13 +7,13 @@
         Pending Slack Invite Request
     </h3> <br>
     <h4>
-        <b>Name:</b> {{ $name }}
+        <b>Name:</b> {{ $invited->name }}
     </h4>
     <h4>
-        <b>Email:</b> {{ $email }}
+        <b>Email:</b> {{ $invited->email }}
     </h4> <br>
     <h4>
-        <a href="https://laraveldfw.com/confirmSlackInvite/{{ $token }}">Click here to confirm the invite</a>
+        <a href="{{ $invited->generateConfirmationURL() }}">Click here to confirm the invite</a>
     </h4>
 </body>
 </html>

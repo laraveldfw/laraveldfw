@@ -28,7 +28,7 @@ class SendSlackInvite
     public function handle(SlackInviteConfirmed $event)
     {
         $response = $event->invited->inviteToTeam();
-        if (!$response['ok']) {
+        if (!$response->ok) {
             Log::error('Error trying to send Slack Invite', [$response]);
         }
     }

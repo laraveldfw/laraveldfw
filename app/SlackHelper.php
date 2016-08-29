@@ -80,9 +80,10 @@ class SlackHelper {
     public function emailIsUniqueToTeam($email)
     {
         $users = $this->getAllUsers();
-        return !($users->contains(function ($user) use ($email) {
-            return $user->profile->email !== $email;
+        $unique = !($users->contains(function ($user) use ($email, &$v) {
+            return $user->profile->email === $email;
         }));
+        return $unique;
     }
 
     private function getAllUsers()
