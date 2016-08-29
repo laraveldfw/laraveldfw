@@ -6,6 +6,7 @@ use App\Events\SlackInviteConfirmed;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\SlackHelper;
+use Log;
 
 class NotifyViaSlack
 {
@@ -27,6 +28,10 @@ class NotifyViaSlack
      */
     public function handle(SlackInviteConfirmed $event)
     {
-        //
+        $helper = new SlackHelper();
+        $response = $helper->notifySlackOfConfirmation($event->invited);
+        if (!$response->ok) {
+            Log::error('Error trying to notify Slack admins of confirmation', [$response, $event->invited->id]);
+        }
     }
 }

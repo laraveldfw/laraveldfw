@@ -11,18 +11,24 @@ use DB;
 use App\SlackInvite;
 use App\Events\SlackInviteConfirmed;
 use App\Events\SlackInviteRequested;
+use Log;
+
 class SlackController extends Controller
 {
 
-    public $slackHelper;
-
     public function __construct()
     {
-        $this->slackHelper = new SlackHelper();
+
     }
 
     public function requestInvite(Requests\SlackInviteRequest $request)
     {
+        $reinvite = false;
+        $existing = SlackInvite::where('email', $request->email)->first();
+        if ($existing) {
+            $reinvite = true;
+            $existing->delete();
+        }
         $invited = SlackInvite::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -33,6 +39,9 @@ class SlackController extends Controller
             if ($response['ok']) {
                 $invited->delete();
             }
+            else {
+                Log::error('Error trying to send Slack invite', [$response, $invited->id]);
+            }
         }
         else {
             event(new SlackInviteRequested($invited));
@@ -40,21 +49,24 @@ class SlackController extends Controller
 
         return response()->json([
             'success' => true,
+            'reinvite' => $reinvite,
         ]);
     }
 
     public function confirmInvite($token)
     {
         $invited = SlackInvite::where('token', $token)->first();
-        if ($invited) {
-            $invited->confirmed_at = Carbon::now();
-            $invited->save();
-            event(new SlackInviteConfirmed($invited));
-            return view('inviteConfirmed', ['name' => $invited->name, 'email' => $invited->email]);
-        }
-        else {
+        $expireMin = config('slack.invite_request.invite_expire_minutes');
+        if (!$invited) {
             abort(400, 'Invite Not Found');
         }
+        elseif ($expireMin && Carbon::now()->gt($invited->created_at->addMinutes($expireMin))) {
+            abort(400, 'Invite Expired');
+        }
+        $invited->confirmed_at = Carbon::now();
+        $invited->save();
+        event(new SlackInviteConfirmed($invited));
+        return view('inviteConfirmed', ['name' => $invited->name, 'email' => $invited->email]);
 
     }
 

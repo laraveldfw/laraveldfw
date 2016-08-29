@@ -56,8 +56,18 @@ class SlackHelper {
 
     /*
      * Notifies that the slack invite was sent and confirmed
+     *
+     * @param SlackInvite $invited
+     *
+     * @returns stdObj response
      */
-
+    public function notifySlackOfConfirmation(SlackInvite $invited)
+    {
+        return $this->slackApiCall('chat.postMessage', [
+            'channel' => '#'.config('slack.invite_request.slack_confirm_channel'),
+            'text' => 'Your confirmation of '.$invited->email.' was processed',
+        ]);
+    }
 
     /*
      * Checks to make sure email is unique to the team

@@ -19,7 +19,10 @@ return [
         // in minutes, put false for no expiration
         'invite_expire_minutes' => false,
 
-        'delete_expired_confirmations' => false,
+        // Number of minutes to delete expired
+        // make sure this is higher than invite_expire_minutes
+        // put false to keep indefinitely
+        'invite_delete_minutes' => 60*24*7,
     ]
 
 ];
