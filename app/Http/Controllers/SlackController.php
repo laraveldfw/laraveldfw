@@ -36,7 +36,7 @@ class SlackController extends Controller
         ]);
         if (config('slack.invite_request.manual_confirm_via') === false) {
             $response = $invited->inviteToTeam();
-            if ($response['ok']) {
+            if ($response->ok) {
                 $invited->delete();
             }
             else {
