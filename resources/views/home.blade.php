@@ -295,7 +295,7 @@
             $("#slackInviteModal").on('shown.bs.modal', function (e) {
                 if (!captchaRendered) {
                     grecaptcha.render($("#captcha")[0], {
-                        sitekey: '{{ env('RECAPTCHA_SITE_KEY') }}',
+                        sitekey: '{{ config('recaptcha.public_key') }}',
                         callback: captchaClicked,
                         "expired-callback": captchaExpired
                     });

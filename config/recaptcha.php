@@ -13,8 +13,8 @@ return [
     | and private_key is the Secret key.
     |
     */
-    'public_key'     => env('RECAPTCHA_SITE_KEY', ''),
-    'private_key'    => env('RECAPTCHA_SECRET_KEY', ''),
+    'public_key'     => env('APP_ENV') === 'local' ? env('RECAPTCHA_TEST_SITE_KEY', '') : env('RECAPTCHA_SITE_KEY', ''),
+    'private_key'    => env('APP_ENV') === 'local' ? env('RECAPTCHA_TEST_SECRET_KEY', '') : env('RECAPTCHA_SECRET_KEY', ''),
 
     /*
     |--------------------------------------------------------------------------
