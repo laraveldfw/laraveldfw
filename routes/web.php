@@ -42,7 +42,8 @@ Route::get('/ask', ['as' => 'ask', function()
 
 Route::get('/live', array('as' => 'live', function()
 {
-    return Redirect::away('http://www.youtube.com/watch?v=yQiqYWIFE-w');
+    // Defaults to Laravel DFW Youtube channel if presentation URL is not present
+    return Redirect::away(env('PRESENTATION_URL', 'https://www.youtube.com/channel/UCL5ERGPXuFrDPr96kIsWu7g'));
 }));
 
 Route::get('/rsvp', array('as' => 'rsvp', function()

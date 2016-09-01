@@ -135,9 +135,10 @@
                                 @if($data['online'] === true)
                                     <!-- Ask Button -->
                                     <a class="btn btn-lg btn-success btn-header-action" data-toggle="modal" href="{{ route('ask') }}" target="_blank">Ask us a Question</a>
-
+                                    @if(env('PRESENTATION_URL'))
                                     <!-- Watch Live Button -->
                                     <a class="btn btn-lg btn-warning btn-header-action" data-toggle="modal" href="{{ route('live') }}" target="_blank">Watch Live</a>
+                                    @endif
                                 @endif
 
                                 <!-- Slack Invite Button -->
