@@ -13,9 +13,16 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'App\Events\SomeEvent' => [
-            'App\Listeners\EventListener',
+        'App\Events\SlackInviteRequested' => [
+            'App\Listeners\SendSlackConfirmation',
+            'App\Listeners\SendEmailConfirmation',
         ],
+
+        'App\Events\SlackInviteConfirmed' => [
+            'App\Listeners\SendSlackInvite',
+            'App\Listeners\NotifyViaSlack',
+            //'App\Listeners\SendWelcomeEmail', TODO?
+        ]
     ];
 
     /**

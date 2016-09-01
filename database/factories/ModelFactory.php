@@ -38,3 +38,15 @@ $factory->define(App\Meetup::class, function ($faker) {
         'additional_info' => $faker->realText(200),
     ];
 });
+
+$factory->define(App\SlackInvite::class, function ($faker) {
+    $created = $faker->dateTimeBetween('-14 days', '-3 days');
+    return [
+        'created_at' => $created,
+        'updated_at' => $created,
+        'name' => $faker->name,
+        'email' => $faker->email,
+        'token' => str_random(32),
+        'confirmed_at' => $faker->optional()->dateTimeBetween('-2 days', 'now'),
+    ];
+});

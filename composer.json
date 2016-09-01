@@ -7,7 +7,10 @@
     "require": {
         "php": ">=5.6.4",
         "laravel/framework": "5.3.*",
-        "dms/meetup-api-client": "^2.2"
+        "dms/meetup-api-client": "^2.2",
+        "barryvdh/laravel-ide-helper": "^2.2",
+        "darovi/laravelslackinvite": "^1.3",
+        "greggilbert/recaptcha": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -141,7 +141,7 @@
                                 @endif
 
                                 <!-- Slack Invite Button -->
-                                <a class="btn btn-lg btn-info btn-header-action" data-toggle="modal" href="{{ route('slack') }}" target="_blank">Join our Slack Group</a>
+                                <button class="btn btn-lg btn-info btn-header-action" data-toggle="modal" data-target="#slackInviteModal">Join our Slack Group</button>
 
                             </div>
                         </div>
@@ -210,11 +210,51 @@
             <p class="text-center copyright">&copy; 2013 - 2015 <a href="http://www.laraveldfw.com">Laravel DFW</a> | <a href="http://www.meetup.com/laravel-dallas-fort-worth" target="_blank">Meetup Group</a></p>
         </footer>
     </div><!-- end .container -->
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="slackInviteModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Slack Invite Request</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group" id="slackEmailGroup">
+                            <label for="slackEmail">Email</label>
+                            <input type="email"
+                                   id="slackEmail"
+                                   name="slackEmail"
+                                   class="form-control" />
+                        </div>
+                        <div class="form-group" id="slackNameGroup">
+                            <label for="slackName">Your Name (or handle)</label>
+                            <input type="text"
+                                   maxlength="50"
+                                   id="slackName"
+                                   name="slackName"
+                                   class="form-control" />
+                        </div>
+                        <div class="form-group" id="slackFeedbackGroup">
+                            <h4 id="slackInviteFeedback"></h4>
+                        </div>
+                        <div id="captcha"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="slackInviteBtn">Request Invite</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 @stop
 
 @section('footer')
-
+    <script src='https://www.google.com/recaptcha/api.js'></script>
     <script type="text/javascript">
+        var token = '{{ csrf_token() }}';
+
         $("body").backstretch("images/laravel-dfw-bg.jpg");
 
         $('.back-to-top').click(function(){
@@ -230,11 +270,101 @@
         $(document).ready(function () {
             var maxInfo = 150;
             var info = $("#additionalInfo").html();
+            var slackEmail = '';
+            var slackName = '';
+            var captchaRendered = false;
+            var captchaActive = true;
+            var captcha = null;
 
             if(info.length > maxInfo){
                 var newInfo = info.substr(0, maxInfo) + '... ' + '<a href="{{ route('rsvp') }}" target="_blank">See More</a>';
                 $("#additionalInfo").html(newInfo);
             }
+
+            function captchaClicked () {
+                captcha = grecaptcha.getResponse();
+                formValidCheck(true);
+            }
+
+            function captchaExpired () {
+                captchaActive = false;
+                formValidCheck(true);
+                $("#slackInviteFeedback").html('The captcha has expired. Please refresh the page.');
+            }
+
+            $("#slackInviteModal").on('shown.bs.modal', function (e) {
+                if (!captchaRendered) {
+                    grecaptcha.render($("#captcha")[0], {
+                        sitekey: '{{ config('recaptcha.public_key') }}',
+                        callback: captchaClicked,
+                        "expired-callback": captchaExpired
+                    });
+                    captchaRendered = true;
+                }
+            });
+
+
+            $("#slackName").keyup(function () {
+               slackName = $("#slackName").val();
+                formValidCheck(true);
+            });
+            $("#slackEmail").keyup(function () {
+                slackEmail = $("#slackEmail").val();
+                formValidCheck(true);
+            });
+
+            function formValidCheck (affectBtn) {
+                 var valid = (typeof slackName === 'string' && slackName.length <= 50 && slackName.length > 1) &&
+                         (typeof slackEmail === 'string' && slackEmail.match(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/) &&
+                         captcha && captchaActive);
+                if (affectBtn) {
+                    $("#slackInviteBtn").prop('disabled', !valid);
+                }
+                return valid;
+            }
+            formValidCheck(true);
+
+            $("#slackInviteBtn").click(function () {
+                if (formValidCheck()) {
+                    $("#slackEmail").prop('disabled', true);
+                    $("#slackName").prop('disabled', true);
+                    $("#slackInviteBtn").prop('disabled', true);
+                    $.ajax({
+                        method: 'post',
+                        url: '/requestSlackInvite',
+                        data: {
+                            name: slackName,
+                            email: slackEmail,
+                            _token: token,
+                            captcha: captcha
+                        },
+                        success: function (response) {
+                            if (response.userExists) {
+                                $("#slackEmail").prop('disabled', false);
+                                $("#slackName").prop('disabled', false);
+                                $("#slackFeedbackGroup").addClass('has-error');
+                                $("#slackInviteFeedback").html('That email already exists in our group');
+                                $("#slackEmailGroup").addClass('has-error');
+                                $("#slackInviteBtn").prop('disabled', false);
+                            }
+                            else if (response.success) {
+                                $("#slackInviteFeedback").html('Your invite request was sent. Check your inbox in a little bit. If you do not see anything soon contact us at support@laraveldfw.com');
+                                $("#slackEmailGroup").addClass('has-success');
+                                $("#slackNameGroup").addClass('has-success');
+                                $("#slackFeedbackGroup").addClass('has-success');
+                            }
+                        },
+                        error: function (jqXhr, status, error) {
+                            console.log(jqXhr, status, error);
+                            @if(env('APP_DEBUG'))
+                            $("#serverErrorContent").html(jqXhr.responseText);
+                            $(".modal").modal('hide');
+                            $("#serverErrorModal").modal('show');
+                            @endif
+                        }
+                    })
+                }
+            })
         });
     </script>
 
