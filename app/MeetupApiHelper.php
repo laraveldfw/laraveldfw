@@ -4,6 +4,8 @@ namespace App;
 
 use Carbon\Carbon;
 use DMS\Service\Meetup\MeetupKeyAuthClient;
+use DMS\Service\Meetup\Response\MultiResultResponse;
+use Illuminate\Database\Eloquent\Collection;
 use Log;
 use Validator;
 
@@ -36,7 +38,7 @@ class MeetupApiHelper {
      * Fetches all meetup events from meetup api and returns collection of results
      *
      * @params none
-     * @return meetup collection
+     * @return MultiResultResponse
      */
     public function fetchAllMeetups ()
     {
@@ -49,7 +51,7 @@ class MeetupApiHelper {
      * Checks for any new or updated meetup info and replicates to the local db
      *
      * @params none
-     * @return meetup collection
+     * @return MultiResultResponse
      */
     public function checkMeetupForUpdates ()
     {
@@ -195,7 +197,7 @@ class MeetupApiHelper {
     * @params description (string|required)
     * @return Collection (keyed by table column name)
     */
-    private function getMetaInfoFromDescription ($description) 
+    private function getMetaInfoFromDescription ($description)
     {
         $metaInfo = collect([]);
         if(!$description) return $metaInfo;
@@ -230,8 +232,8 @@ class MeetupApiHelper {
     /**
     * Wipes out all html tags and meta data from meetup.com description for saving to db
     *
-    * @params descrtiption (html string)
-    * @return formatted description
+    * @params string description (html string)
+    * @return string description
     */
     private function cleanDescription($description)
     {
