@@ -81,5 +81,22 @@ function MeetupService ($http, ExceptionService, $mdToast, $mdDialog) {
                 ExceptionService.errorResponse(error);
                 return error;
             })
-    }    
+    }
+
+    /*
+    * Gets all the members in laravel dfw meetup group
+    *
+    * @params none
+    *
+    * @returns Promise<array members>
+    */
+    self.getAllMembers = getAllMembers;
+    function getAllMembers () {
+        return $http.get('/getAllMembers')
+            .then(function (response) {
+                return response.data.members;
+            }, function (error) {
+                console.error(error);
+            });
+    }
 }

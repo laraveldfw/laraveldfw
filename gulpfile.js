@@ -39,6 +39,7 @@ elixir(function(mix) {
         // create dashboard.js
         .scripts([
             './node_modules/moment/moment.js',
+            './node_modules/geolib/dist/geolib.js',
             'angular/directives/ngAutocomplete.js',
             'angular/directives/ngMaterialDatetimePicker.js',
             'angular/services/auth.service.js',

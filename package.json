@@ -10,6 +10,7 @@
     "angular-material": "^1.0.8",
     "angular-messages": "^1.5.5",
     "bootstrap-sass": "^3.0.0",
+    "geolib": "^2.0.21",
     "laravel-elixir": "*",
     "moment": "^2.13.0"
   }

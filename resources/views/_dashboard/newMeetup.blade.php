@@ -1,4 +1,4 @@
-<form name="newMeetupForm" novalidate ng-submit="createNewMeetup(newMeetupForm)">
+<form name="newMeetupForm" novalidate ng-submit="createNewMeetup(newMeetupForm)" ng-show="activePane === 'createMeetup'">
     <div layout="row" layout-align="center center">
         <h3 class="md-title">
             Create a new Meetup
