@@ -94,9 +94,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/getAllMeetups', 'DashboardController@getAllMeetups');
     Route::post('/saveNewMeetup', 'DashboardController@saveNewMeetup');
 
-
+    Route::get('/getAllMembers', 'DashboardController@getAllMembers');
 });
 
 
 Route::post('/requestSlackInvite', 'SlackController@requestInvite');
 Route::get('/confirmSlackInvite/{token}', 'SlackController@confirmInvite');
+Route::get('/test', 'DashboardController@test');

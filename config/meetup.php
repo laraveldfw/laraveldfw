@@ -18,6 +18,8 @@ return [
             'column' => 'speaker_url',
             'validate' => 'url'
         ],
-    ]
+    ],
+
+    'members_cache_timeout' => (4*60),
 
 ];

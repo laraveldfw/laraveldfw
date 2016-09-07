@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Meetup;
+use Cache;
+
 class DashboardController extends Controller
 {
     /**
@@ -49,6 +51,24 @@ class DashboardController extends Controller
             'success' => true,
             'meetup' => $meetup->toArray(),
         ]);
+    }
+
+    public function getAllMembers()
+    {
+        $members = Cache::remember('MeetupMembers', config('meetup.members_cache_timeout', (4*60)), function () {
+            $helper = new \App\MeetupApiHelper();
+            return $helper->fetchAllMeetupMembers();
+        });
+
+        return response()->json([
+            'members' => $members,
+        ]);
+    }
+
+    public function test()
+    {
+        $helper = new \App\MeetupApiHelper();
+        dd($helper->fetchAllMeetupMembers());
     }
 
 }

@@ -8,6 +8,7 @@ use DMS\Service\Meetup\Response\MultiResultResponse;
 use Illuminate\Database\Eloquent\Collection;
 use Log;
 use Validator;
+use Cache;
 
 class MeetupApiHelper {
     
@@ -45,6 +46,20 @@ class MeetupApiHelper {
         return $this->client->getEvents([
             'group_urlname' => $this->meetupUrlName,
         ]);
+    }
+    
+    /**
+    * Fetches all members from meetup api
+    *
+    * @param none
+    * @return MultiResultResponse
+    */
+    public function fetchAllMeetupMembers()
+    {
+        $members = $this->client->getMembersv2([
+            'group_urlname' => $this->meetupUrlName,
+        ]);
+        return $members->getData();
     }
 
     /**
