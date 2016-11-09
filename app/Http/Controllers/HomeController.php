@@ -15,7 +15,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show($openSlackModal = false)
     {
         
         $meetup = Meetup::where('status', 'upcoming')
@@ -26,7 +26,19 @@ class HomeController extends Controller
         return view('home', [
             'data' => $meetup->toArray(),
             'startTime' => $meetup->start_time->timezone('America/Chicago')->format('l, F jS g:iA'),
+            'openSlackModal' => $openSlackModal,
         ]);
+    }
+
+    /**
+    * Display home page with slack modal pulled up
+    *
+    * @params none
+    * @return \Illuminate\View\Factory
+    */
+    public function showSlackModal()
+    {
+        return $this->show(true);
     }
 
 }

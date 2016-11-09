@@ -255,7 +255,7 @@
     <script src='https://www.google.com/recaptcha/api.js'></script>
     <script type="text/javascript">
         var token = '{{ csrf_token() }}';
-
+        var openSlackModal = {{ $openSlackModal ? 'true' : 'false' }};
         $("body").backstretch("images/laravel-dfw-bg.jpg");
 
         $('.back-to-top').click(function(){
@@ -365,7 +365,13 @@
                         }
                     })
                 }
-            })
+            });
+
+            if (openSlackModal) {
+                setTimeout(function () {
+                    $("#slackInviteModal").modal('show');
+                }, 1500);
+            }
         });
     </script>
 
