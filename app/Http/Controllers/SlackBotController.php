@@ -15,7 +15,7 @@ class SlackBotController extends Controller
         
     }
 
-    public function slackPost(\Illuminate\Http\Request $request)
+    public function post(\Illuminate\Http\Request $request)
     {
         $payload = $request->json();
 
