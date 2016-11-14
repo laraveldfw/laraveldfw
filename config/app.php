@@ -175,13 +175,14 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        \SocialiteProviders\Manager\ServiceProvider::class,
 
         /*
          * Third party service providers
          */
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Greggilbert\Recaptcha\RecaptchaServiceProvider::class,
-
+        Mpociot\SlackBot\SlackBotServiceProvider::class,
     ],
 
     /*
@@ -229,7 +230,8 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Recaptcha' => Greggilbert\Recaptcha\Facades\Recaptcha::class,
-
+        'SlackBot' => Mpociot\SlackBot\Facades\SlackBot::class,
+        'Socialite' => \Laravel\Socialite\Facades\Socialite::class,
     ],
 
 ];

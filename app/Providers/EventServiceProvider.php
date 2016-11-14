@@ -22,7 +22,12 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\SendSlackInvite',
             'App\Listeners\NotifyViaSlack',
             //'App\Listeners\SendWelcomeEmail', TODO?
-        ]
+        ],
+
+        \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+            // add your listeners (aka providers) here
+            'Mpociot\Socialite\Slack\SlackExtendSocialite@handle',
+        ],
     ];
 
     /**

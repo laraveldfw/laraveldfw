@@ -10,7 +10,11 @@
         "dms/meetup-api-client": "^2.2",
         "barryvdh/laravel-ide-helper": "^2.2",
         "darovi/laravelslackinvite": "^1.3",
-        "greggilbert/recaptcha": "dev-master"
+        "greggilbert/recaptcha": "dev-master",
+        "mpociot/slackbot": "^0.1.0",
+        "laravel/socialite": "^2.0",
+        "mpociot/socialite-slack": "^1.1",
+        "guzzlehttp/guzzle": "^6.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
