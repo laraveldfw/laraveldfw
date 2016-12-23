@@ -81,7 +81,7 @@ class SlackHelper {
     {
         $users = $this->getAllUsers();
         $unique = !($users->contains(function ($user) use ($email, &$v) {
-            return $user->profile->email === $email;
+            return isset($user->profile->email) ? $user->profile->email === $email : false;
         }));
         return $unique;
     }
