@@ -47,13 +47,14 @@ Route::get('/live', array('as' => 'live', function()
 
 Route::get('/rsvp', array('as' => 'rsvp', function()
 {
-    $meetup = \DB::table('meetups')
-        ->where('status', 'upcoming')
-        ->where('visibility', 'public')
-        ->orderBy('start_time', 'asc')
-        ->select('meetup_id')
-        ->first();
-  return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/'.$meetup->meetup_id.'/');
+//     $meetup = \DB::table('meetups')
+//         ->where('status', 'upcoming')
+//         ->where('visibility', 'public')
+//         ->orderBy('start_time', 'asc')
+//         ->select('meetup_id')
+//         ->first();
+//   return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/'.$meetup->meetup_id.'/');
+  return Redirect::away('https://www.meetup.com/laravel-dallas-fort-worth/events/236723204/');
 }));
 
 Route::get('/slack', array('as' => 'slack', function()
