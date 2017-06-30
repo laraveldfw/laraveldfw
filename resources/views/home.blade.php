@@ -77,17 +77,18 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Resources <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     <li class="dropdown-header">Sites</li>
-                                    <li><a href="http://www.laravel.com" target="_blank">Laravel.com <span class="menu-subtext">Official Website</span></a></li>
-                                    <li><a href="http://laravel.com/docs" target="_blank">Laravel Docs</a></li>
-                                    <li><a href="http://www.laracasts.com" target="_blank">Laracasts <span class="menu-subtext">Video Tutorials</span></a></li>
-                                    <li><a href="http://www.laravel.io" target="_blank">Laravel.io <span class="menu-subtext">The Community</span></a></li>
-                                    <li><a href="http://www.larajobs.com" target="_blank">Larajobs.com <span class="menu-subtext">Find a Job</span></a></li>
-                                    <li><a href="https://leanpub.com/book_search?search=laravel" target="_blank">Books</a></li>
+                                    <li><a href="https://www.laravel.com" target="_blank">Laravel.com <span class="menu-subtext">Official Website</span></a></li>
+                                    <li><a href="https://laravel.com/docs" target="_blank">Laravel Docs</a></li>
+                                    <li><a href="https://www.laracasts.com" target="_blank">Laracasts <span class="menu-subtext">Video Tutorials</span></a></li>
+                                    <li><a href="https://leanpub.com/bookstore/type/book/sort/earnings_in_last_7_days?search=laravel" target="_blank">Books <span class="menu-subtext">Read and Learn</span></a></li>
+                                    <li><a href="https://www.laravel.io" target="_blank">Laravel.io <span class="menu-subtext">The Community</span></a></li>
+                                    <li><a href="https://www.larajobs.com" target="_blank">Larajobs.com <span class="menu-subtext">Find a Job</span></a></li>
                                     <li class="divider"></li>
                                     <li class="dropdown-header">Twitter Accounts</li>
+                                    <li><a href="https://twitter.com/laraveldfw" target="_blank">@laraveldfw</a></li>
                                     <li><a href="https://twitter.com/laravelphp" target="_blank">@laravelphp</a></li>
-                                    <li><a href="https://twitter.com/LaravelIO" target="_blank">@laravelio</a></li>
                                     <li><a href="https://twitter.com/laracasts" target="_blank">@laracasts</a></li>
+                                    <li><a href="https://twitter.com/LaravelIO" target="_blank">@laravelio</a></li>
                                 </ul>
                             </li>
                             <li><a href="/login" target="_self">Admins</a></li>
