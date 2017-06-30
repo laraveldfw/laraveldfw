@@ -54,7 +54,7 @@ Route::get('/rsvp', array('as' => 'rsvp', function()
 //         ->select('meetup_id')
 //         ->first();
 //   return Redirect::away('http://www.meetup.com/laravel-dallas-fort-worth/events/'.$meetup->meetup_id.'/');
-  return Redirect::away('https://www.meetup.com/laravel-dallas-fort-worth/events/236723204/');
+  return Redirect::away('https://www.meetup.com/laravel-dallas-fort-worth/events/240026516/');
 }));
 
 Route::get('/slack', array('as' => 'slack', function()
@@ -68,7 +68,7 @@ Route::get('/tell-us-about-you', ['as' => 'tellusaboutyou', function()
 }]);
 
 // Auth Stuff
-Route::get('/logout', function() 
+Route::get('/logout', function()
 {
   Auth::logout();
   return redirect('/');
@@ -87,14 +87,14 @@ Route::get('/getEnv', function () {
 
 
 Route::group(['middleware' => ['auth']], function () {
-    
+
     Route::get('/getAllUsers', 'LoginController@getAllUsers');
-    
+
     Route::get('/dashboard', 'DashboardController@show');
     Route::get('/getAllMeetups', 'DashboardController@getAllMeetups');
     Route::post('/saveNewMeetup', 'DashboardController@saveNewMeetup');
-    
-    
+
+
 });
 
 // Letsencrypt validation
@@ -107,4 +107,3 @@ Route::get('/.well-known/acme-challenge/{pathId}', function ($pathId) {
     }
     abort(404);
 });
-
