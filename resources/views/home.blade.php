@@ -208,7 +208,7 @@
         </div>
         <footer>
             <p class="pull-right back-to-top"><a class="back-to-top" href="#">Back to top</a></p>
-            <p class="text-center copyright">&copy; 2013 - 2015 <a href="http://www.laraveldfw.com">Laravel DFW</a> | <a href="http://www.meetup.com/laravel-dallas-fort-worth" target="_blank">Meetup Group</a></p>
+            <p class="text-center copyright">&copy; 2013 - {{ date("Y") }} <a href="http://www.laraveldfw.com">Laravel DFW</a> | <a href="http://www.meetup.com/laravel-dallas-fort-worth" target="_blank">Meetup Group</a></p>
         </footer>
     </div><!-- end .container -->
 
